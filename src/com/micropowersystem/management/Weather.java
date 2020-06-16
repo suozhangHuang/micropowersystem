@@ -7,7 +7,8 @@ public class Weather extends Thread
 			double cloudness,
 			double pressure,
 			double UVindex,
-			double visibility)
+			double visibility,
+			double windSpeed)
 	{
 		this.temperature = temperature;
 		this.humidity = humidity;
@@ -15,6 +16,7 @@ public class Weather extends Thread
 		this.pressure = pressure;
 		this.UVindex = UVindex;
 		this.visibility = visibility;
+		this.windSpeed = windSpeed;
 		
 		// 启动自动更新线程
 		this.start();
@@ -28,6 +30,7 @@ public class Weather extends Thread
 		this.pressure = 0;
 		this.UVindex = 0;
 		this.visibility = 0;
+		this.windSpeed = 0;
 	}
 	
 	// 获取当前时间下的天气
@@ -54,6 +57,10 @@ public class Weather extends Thread
 	public double getVisibility()
 	{
 		return visibility;
+	}
+	public double getWindSpeed()
+	{
+		return windSpeed;
 	}
 
 	// 获取指定时间下的天气值
@@ -82,6 +89,10 @@ public class Weather extends Thread
 	{
 		return visibility;
 	}
+	public double getWindSpeed(long time)
+	{
+		return windSpeed;
+	}
 
 	public void run()
 	{
@@ -97,6 +108,7 @@ public class Weather extends Thread
 			this.pressure = getPressure(timestamp);
 			this.UVindex = getUVindex(timestamp);
 			this.visibility = getVisibility(timestamp);
+			this.windSpeed = getWindSpeed(timestamp);
 			
 			// 休眠一段时间再进行刷新
 			timestampStart = System.currentTimeMillis();
@@ -118,6 +130,7 @@ public class Weather extends Thread
 	private double pressure;
 	private double UVindex;
 	private double visibility;
+	private double windSpeed;
 
 	// 仿真中的刷新实际间隔时间(ms)
 	private final long REFRESH_INTERVAL = 1000;
