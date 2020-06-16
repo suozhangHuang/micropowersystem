@@ -2,8 +2,8 @@ package com.micropowersystem.management;
 
 public interface Generator
 {
-	// 传入发电机参数
-	public void sendInfo(double voltage, double power);
+	// 获取发电机信息
+	public String getInfo();
 
 	// 设置天气对象
 	public void setWeatherCondition(Weather weather);
