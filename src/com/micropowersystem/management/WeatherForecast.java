@@ -64,6 +64,10 @@ public class WeatherForecast
 	{
 		return weather.getVisibility(time);
 	}
+	public double getWindSpeed(long time)
+	{
+		return weather.getWindSpeed(time);
+	}
 
 	private Weather weather;
 }
