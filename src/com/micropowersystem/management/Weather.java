@@ -97,10 +97,12 @@ public class Weather extends Thread
 	public void run()
 	{
 		long timestampStart = System.currentTimeMillis();
+		long timeDelta = 0;
 		while(true)
 		{
-			// 计算休眠时间，并更新当前时刻的天气值
-			timestamp += (System.currentTimeMillis() - timestampStart)*TIME_SCALE;
+			// 计算休眠时间，并更新当前时刻的电价
+			timeDelta = (System.currentTimeMillis() - timestampStart)*TIME_SCALE - timestamp;
+			timestamp = (System.currentTimeMillis() - timestampStart)*TIME_SCALE;
 
 			this.temperature = getTemperature(timestamp);
 			this.humidity = getHumidity(timestamp);

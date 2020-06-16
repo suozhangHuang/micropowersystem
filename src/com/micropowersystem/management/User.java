@@ -40,21 +40,22 @@ public class User extends Thread
 	public void run()
 	{
 		long timestampStart = System.currentTimeMillis();
+		long timeDelta = 0;
 		while(true)
 		{
-			// 计算休眠时间，并更新当前时刻的天气值
-			timestamp += (System.currentTimeMillis() - timestampStart)*TIME_SCALE;
+			// 计算休眠时间，并更新当前时刻的电价
+			timeDelta = (System.currentTimeMillis() - timestampStart)*TIME_SCALE - timestamp;
+			timestamp = (System.currentTimeMillis() - timestampStart)*TIME_SCALE;
+
 			
 			// 根据用户类型和时间戳更新用户用电功率
 			synchronized(this)
 			{
 				// TODO 实现用户用电量信息更新
 				// currentPower = ...;
-				currentEnergy += currentPower * (System.currentTimeMillis() - timestampStart)*TIME_SCALE/1000;
+				currentEnergy += currentPower * timeDelta;
 			}
 			
-			// 休眠一段时间再进行刷新
-			timestampStart = System.currentTimeMillis();
 			try
 			{
 				Thread.sleep(REFRESH_INTERVAL);
