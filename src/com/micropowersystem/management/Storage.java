@@ -47,14 +47,16 @@ public class Storage extends Thread
 	public void run()
 	{
 		long timestampStart = System.currentTimeMillis();
+		long timeDelta = 0;
 		while(true)
 		{
-			// 计算休眠时间，并更新当前储能值
-			long time = System.currentTimeMillis() - timestampStart;
+			// 计算休眠时间，并更新当前时刻的电价
+			timeDelta = (System.currentTimeMillis() - timestampStart)*TIME_SCALE - timestamp;
+			timestamp = (System.currentTimeMillis() - timestampStart)*TIME_SCALE;
 
 			synchronized(this)
 			{
-				currentEnergy += inputPower * time/1000 * TIME_SCALE;
+				currentEnergy += inputPower * timeDelta;
 				if(currentEnergy > capacity)
 				{
 					currentEnergy = capacity;
@@ -65,8 +67,6 @@ public class Storage extends Thread
 				}
 			}
 			
-			// 休眠一段时间再进行刷新
-			timestampStart = System.currentTimeMillis();
 			try
 			{
 				Thread.sleep(REFRESH_INTERVAL);
@@ -81,6 +81,7 @@ public class Storage extends Thread
 	private double capacity;
 	private double currentEnergy;
 	private double inputPower;
+	private long timestamp;
 	
 	// 标记仿真是否开始
 	private boolean started = false;

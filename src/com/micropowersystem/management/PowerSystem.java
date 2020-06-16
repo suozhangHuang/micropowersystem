@@ -38,10 +38,12 @@ public class PowerSystem extends Thread
 	public void run()
 	{
 		long timestampStart = System.currentTimeMillis();
+		long timeDelta = 0;
 		while(true)
 		{
 			// 计算休眠时间，并更新当前时刻的电价
-			timestamp += (System.currentTimeMillis() - timestampStart)*TIME_SCALE;
+			timeDelta = (System.currentTimeMillis() - timestampStart)*TIME_SCALE - timestamp;
+			timestamp = (System.currentTimeMillis() - timestampStart)*TIME_SCALE;
 			
 			// TODO 根据当前的时间戳更新电价信息
 			synchronized(this)
@@ -49,8 +51,6 @@ public class PowerSystem extends Thread
 				// price = ... ;
 			}
 			
-			// 休眠一段时间再进行刷新
-			timestampStart = System.currentTimeMillis();
 			try
 			{
 				Thread.sleep(REFRESH_INTERVAL);
