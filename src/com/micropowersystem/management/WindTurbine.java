@@ -4,10 +4,9 @@ public class WindTurbine extends Thread implements Generator
 {
 
 	@Override
-	public void sendInfo(double voltage, double power)
+	public String getInfo()
 	{
-		this.voltageBase = voltage;
-		this.powerBase = power;
+		return null;
 	}
 
 	@Override
@@ -16,12 +15,7 @@ public class WindTurbine extends Thread implements Generator
 		this.weather = weather;
 	}
 
-	@Override
-	public void setWeatherForecast(WeatherForecast weatherForecast)
-	{
-		this.weatherForecast = weatherForecast;
-	}
-
+	
 	@Override
 	public double getVoltage(int type)
 	{
@@ -62,24 +56,6 @@ public class WindTurbine extends Thread implements Generator
 			return getPower(weather.getWindSpeed(timestamp));
 		}
 		return 0;
-	}
-
-	@Override
-	public double getVoltageForecast(long time)
-	{
-		return getVoltage(weatherForecast.getWindSpeed(time));
-	}
-
-	@Override
-	public double getCurrentForecast(long time)
-	{
-		return getCurrent(weatherForecast.getWindSpeed(time));
-	}
-
-	@Override
-	public double getPowerForecast(long time)
-	{
-		return getPower(weatherForecast.getWindSpeed(time));
 	}
 
 	@Override
