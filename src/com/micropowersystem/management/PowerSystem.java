@@ -12,17 +12,14 @@ public class PowerSystem extends Thread
 		this.start();
 	}
 	
-	public void setPrice(double price)
-	{
-		synchronized(this)
-		{
-			this.price = price;
-		}
-	}
-	
-	public double getPrice()
+	public double getBuyingPrice()
 	{
 		return price;
+	}
+	
+	public double getSellingPrice()
+	{
+		return price * 0.95;
 	}
 	
 	public void setCondition(boolean providePower)
