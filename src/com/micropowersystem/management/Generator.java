@@ -7,8 +7,6 @@ public interface Generator
 
 	// 设置天气对象
 	public void setWeatherCondition(Weather weather);
-	// 设置天气预测对象
-	public void setWeatherForecast(WeatherForecast weatherForecast);
 	
 	// 获取发电机参数
 	int NOMIAL = 0;
@@ -17,9 +15,6 @@ public interface Generator
 	public double getCurrent(int type);
 	public double getPower(int type);
 	
-	public double getVoltageForecast(long time);
-	public double getCurrentForecast(long time);
-	public double getPowerForecast(long time);
 	
 	// 读取发电机电能表数值
 	public double getWattHour();

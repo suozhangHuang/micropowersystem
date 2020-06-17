@@ -16,7 +16,7 @@ public class WeatherForecast
 	// TODO 实现获取预测值的功能
 	public double getTemperature()
 	{
-		return weather.getTemperature();
+		return weather.getTemperature()+Math.random()*0.2-0.1;
 	}
 	public double getHumidity()
 	{
@@ -24,25 +24,35 @@ public class WeatherForecast
 	}
 	public double getCloudness()
 	{
-		return weather.getCloudness();
+		double cloudness = weather.getCloudness();
+		cloudness = Math.random()*0.1-0.05;
+		if(cloudness>=1)
+			cloudness = 0.99;
+		if(cloudness<0)
+			cloudness = 0;
+		return cloudness;
 	}
 	public double getPressure()
 	{
 		return weather.getPressure();
 	}
-	public double getUVindex()
+	public double getRadiancy()
 	{
-		return weather.getUVindex();
+		return weather.getRadiancy();
 	}
 	public double getVisibility()
 	{
 		return weather.getVisibility();
 	}
-
+	public double getWindSpeed()
+	{
+		return weather.getWindSpeed()+Math.random()*2-1;
+	}
+	
 	// 获取指定之间下的天气预测值
 	public double getTemperature(long time)
 	{
-		return weather.getTemperature(time);
+		return weather.getTemperature(time)+Math.random()*0.2-0.1;
 	}
 	public double getHumidity(long time)
 	{
@@ -50,15 +60,21 @@ public class WeatherForecast
 	}
 	public double getCloudness(long time)
 	{
-		return weather.getCloudness(time);
+		double cloudness = weather.getCloudness(time);
+		cloudness = Math.random()*0.1-0.05;
+		if(cloudness>=1)
+			cloudness = 0.99;
+		if(cloudness<0)
+			cloudness = 0;
+		return cloudness;
 	}
 	public double getPressure(long time)
 	{
 		return weather.getPressure(time);
 	}
-	public double getUVindex(long time)
+	public double getRadiancy(long time)
 	{
-		return weather.getUVindex(time);
+		return weather.getRadiancy(time);
 	}
 	public double getVisibility(long time)
 	{
@@ -66,7 +82,7 @@ public class WeatherForecast
 	}
 	public double getWindSpeed(long time)
 	{
-		return weather.getWindSpeed(time);
+		return weather.getWindSpeed(time)+Math.random()*2-1;
 	}
 
 	private Weather weather;
