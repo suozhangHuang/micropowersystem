@@ -1,13 +1,38 @@
 package com.micropowersystem.management;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 public class WindTurbine extends Thread implements Generator
 {
+	public WindTurbine(String infoFileName) throws IOException
+	{
+		Properties properties = new Properties();
+		properties.load(new FileInputStream(infoFileName));
+
+		name = properties.getProperty("name");
+		voltageBase = Double.parseDouble(properties.getProperty("voltageBase"));
+		powerBase = Double.parseDouble(properties.getProperty("powerBase"));
+		minWindSpeed = Double.parseDouble(properties.getProperty("minWindSpeed"));
+		nomialWindSpeed = Double.parseDouble(properties.getProperty("nomialWindSpeed"));
+		curtailingSpeed = Double.parseDouble(properties.getProperty("curtailingSpeed"));
+
+		bladeRadius = Double.parseDouble(properties.getProperty("bladeRadius"));
+
+	}
 
 	@Override
-	public void sendInfo(double voltage, double power)
+	public String getInfo()
 	{
-		this.voltageBase = voltage;
-		this.powerBase = power;
+		return String.format("name %s\nvoltageBase %f\npowerBase %f\nminWindSpeed %f\nnomialWindSpeed %f\ncurtailingSpeed %f\nbladeRadius %f\n",
+				name,
+				voltageBase,
+				powerBase,
+				minWindSpeed,
+				nomialWindSpeed,
+				curtailingSpeed,
+				bladeRadius);
 	}
 
 	@Override
@@ -25,11 +50,11 @@ public class WindTurbine extends Thread implements Generator
 	@Override
 	public double getVoltage(int type)
 	{
-		if(type == NOMIAL)
+		if (type == NOMIAL)
 		{
 			return this.voltageBase;
 		}
-		if(type == REALTIME)
+		if (type == REALTIME)
 		{
 			return getVoltage(weather.getWindSpeed(timestamp));
 		}
@@ -39,11 +64,11 @@ public class WindTurbine extends Thread implements Generator
 	@Override
 	public double getCurrent(int type)
 	{
-		if(type == NOMIAL)
+		if (type == NOMIAL)
 		{
-			return powerBase/voltageBase;
+			return powerBase / voltageBase;
 		}
-		if(type == REALTIME)
+		if (type == REALTIME)
 		{
 			return getCurrent(weather.getWindSpeed(timestamp));
 		}
@@ -53,11 +78,11 @@ public class WindTurbine extends Thread implements Generator
 	@Override
 	public double getPower(int type)
 	{
-		if(type == NOMIAL)
+		if (type == NOMIAL)
 		{
 			return powerBase;
 		}
-		if(type == REALTIME)
+		if (type == REALTIME)
 		{
 			return getPower(weather.getWindSpeed(timestamp));
 		}
@@ -85,7 +110,7 @@ public class WindTurbine extends Thread implements Generator
 	@Override
 	public double getWattHour()
 	{
-		synchronized(this)
+		synchronized (this)
 		{
 			return energyMeter;
 		}
@@ -94,50 +119,52 @@ public class WindTurbine extends Thread implements Generator
 	@Override
 	public void output()
 	{
-		//do something
+		// do something
 		System.out.printf("WIND TURBINE:output power!\n");
 	}
-	
+
 	// 实时数据计算
 	private double getVoltage(double windSpeed)
 	{
 		return voltageBase;
 	}
+
 	private double getCurrent(double windSpeed)
 	{
-		return getPower(windSpeed)/getVoltage(windSpeed);
+		return getPower(windSpeed) / getVoltage(windSpeed);
 	}
+
 	private double getPower(double windSpeed)
 	{
-		if(windSpeed < minWindSpeed)
+		if (windSpeed < minWindSpeed)
 		{
 			return 0;
 		}
-		if(windSpeed > curtailingSpeed)
+		if (windSpeed > curtailingSpeed)
 		{
 			return 0;
 		}
-		if(windSpeed > maxWindSpeed)
+		if (windSpeed > nomialWindSpeed)
 		{
 			return powerBase;
 		}
-		
-		return powerBase * (windSpeed - minWindSpeed)/(maxWindSpeed - minWindSpeed);
+
+		return powerBase * (windSpeed - minWindSpeed) / (nomialWindSpeed - minWindSpeed);
 	}
-	
+
 	// 实时数据更新
 	public void run()
 	{
 		long timestampStart = System.currentTimeMillis();
 		long timeDelta = 0;
-		while(true)
+		while (true)
 		{
 			// 计算休眠时间，并更新当前时刻的电价
-			timeDelta = (System.currentTimeMillis() - timestampStart)*TIME_SCALE - timestamp;
-			timestamp = (System.currentTimeMillis() - timestampStart)*TIME_SCALE;
+			timeDelta = (System.currentTimeMillis() - timestampStart) * TIME_SCALE - timestamp;
+			timestamp = (System.currentTimeMillis() - timestampStart) * TIME_SCALE;
 
 			this.energyMeter += getPower(weather.getWindSpeed()) * timeDelta;
-			
+
 			try
 			{
 				Thread.sleep(REFRESH_INTERVAL);
@@ -147,17 +174,20 @@ public class WindTurbine extends Thread implements Generator
 			}
 		}
 	}
-	
+
 	// 电站参数
+	private String name;
 	private double voltageBase;
 	private double powerBase;
-	private final double minWindSpeed = 4;
-	private final double maxWindSpeed = 10;
-	private final double curtailingSpeed = 20;
-	
+	private double minWindSpeed;
+	private double nomialWindSpeed;
+	private double curtailingSpeed;
+
+	private double bladeRadius;
+
 	// 电站数据
 	private double energyMeter = 0;
-	
+
 	// 环境信息
 	private Weather weather;
 	private WeatherForecast weatherForecast;

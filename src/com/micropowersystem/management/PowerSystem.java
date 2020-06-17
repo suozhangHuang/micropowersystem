@@ -1,5 +1,8 @@
 package com.micropowersystem.management;
 
+import java.sql.Date;
+import java.util.Calendar;
+
 public class PowerSystem extends Thread
 {
 	public PowerSystem()
@@ -48,7 +51,17 @@ public class PowerSystem extends Thread
 			// TODO 根据当前的时间戳更新电价信息
 			synchronized(this)
 			{
-				// price = ... ;
+				price = 1;
+				
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(new Date(timestamp));
+				
+				price *= 0.5*Math.abs(calendar.get(Calendar.MONTH) - 6.5)/(6.5);
+				
+				if(calendar.get(Calendar.HOUR) < 8 || calendar.get(Calendar.HOUR) > 18)
+					price *= 1;
+				else
+					price *= 2;
 			}
 			
 			try
