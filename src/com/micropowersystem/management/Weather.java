@@ -181,8 +181,8 @@ public class Weather extends Thread
 			
 			// 计算休眠时间，并更新当前时刻的电价
 			long currentTime = System.currentTimeMillis();
-			timeDelta = (currentTime - timestampStart)*TIME_SCALE/1000 - timestamp;
-			timestamp = (currentTime - timestampStart)*TIME_SCALE/1000;
+			timeDelta = (currentTime - timestampStart)*TIME_SCALE - timestamp;
+			timestamp = (currentTime - timestampStart)*TIME_SCALE;
 			
 			
 			
