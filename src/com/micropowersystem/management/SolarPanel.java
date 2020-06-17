@@ -119,7 +119,7 @@ public class SolarPanel extends Thread implements Generator{
 			timeDelta = (currentTime - timestampStart)*TIME_SCALE - timestamp;
 			timestamp = (currentTime - timestampStart)*TIME_SCALE;
 
-			this.energyMeter += getPower(weather.getTemperature(),weather.getRadiancy(),weather.getCloudness()) * timeDelta;
+			this.energyMeter += getPower(weather.getTemperature(),weather.getRadiancy(),weather.getCloudness()) * timeDelta/1000;
 			
 			try
 			{

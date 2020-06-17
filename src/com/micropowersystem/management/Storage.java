@@ -56,7 +56,7 @@ public class Storage extends Thread
 
 			synchronized(this)
 			{
-				currentEnergy += inputPower * timeDelta;
+				currentEnergy += inputPower * timeDelta/1000;
 				if(currentEnergy > capacity)
 				{
 					currentEnergy = capacity;

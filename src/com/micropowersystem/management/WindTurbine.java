@@ -42,12 +42,6 @@ public class WindTurbine extends Thread implements Generator
 	}
 
 	@Override
-	public void setWeatherForecast(WeatherForecast weatherForecast)
-	{
-		this.weatherForecast = weatherForecast;
-	}
-
-	@Override
 	public double getVoltage(int type)
 	{
 		if (type == NOMIAL)
@@ -89,23 +83,6 @@ public class WindTurbine extends Thread implements Generator
 		return 0;
 	}
 
-	@Override
-	public double getVoltageForecast(long time)
-	{
-		return getVoltage(weatherForecast.getWindSpeed(time));
-	}
-
-	@Override
-	public double getCurrentForecast(long time)
-	{
-		return getCurrent(weatherForecast.getWindSpeed(time));
-	}
-
-	@Override
-	public double getPowerForecast(long time)
-	{
-		return getPower(weatherForecast.getWindSpeed(time));
-	}
 
 	@Override
 	public double getWattHour()
@@ -190,7 +167,6 @@ public class WindTurbine extends Thread implements Generator
 
 	// 环境信息
 	private Weather weather;
-	private WeatherForecast weatherForecast;
 	private long timestamp;
 
 	// 仿真中的刷新实际间隔时间(ms)
