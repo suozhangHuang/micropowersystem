@@ -10,6 +10,7 @@ public interface Management {
 	final int GENERATOR = 0;
 	final int STORAGE = 1;
 	final int USER = 2;
+	final int POWERSYSTEM = 3;
 	
 	public boolean getManagerStatus();
 	
@@ -19,6 +20,7 @@ public interface Management {
 	//返回指定类型的设备的实时功率值，String对应的是设备的标识
 	public HashMap<String,TimeSeries> getPowerTimeSeries(int TYPE);
 	public HashMap<String,TimeSeries> getVoltageTimeSeries(int TYPE);
+	public TimeSeries getPrices(int TYPE);
 	
 	//
 	public TimeSeries getTotalPowerTimeSeries(int TYPE);
