@@ -15,8 +15,10 @@ import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.ValueAxis;  
 import org.jfree.chart.labels.ItemLabelAnchor;  
 import org.jfree.chart.labels.ItemLabelPosition;  
-import org.jfree.chart.labels.StandardXYItemLabelGenerator;  
-import org.jfree.chart.plot.XYPlot;  
+import org.jfree.chart.labels.StandardXYItemLabelGenerator;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;  
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;  
 import org.jfree.chart.title.TextTitle;
@@ -43,6 +45,7 @@ public class DataProcessorTool {
 
         chart.setTitle(new TextTitle(title, fontTitle));//设置标题字体样式 
        
+
         
         XYPlot plot = (XYPlot) chart.getPlot();             
         
@@ -59,13 +62,15 @@ public class DataProcessorTool {
          
          
         XYItemRenderer xyitem = plot.getRenderer();         //设置曲线显示各数据点的值  
-        xyitem.setBaseItemLabelsVisible(false);    //改为true即可以显示每点的数值  
+        xyitem.setBaseItemLabelsVisible(false);    //改为true即可以显示每点的数值 
         xyitem.setBasePositiveItemLabelPosition(  
                 new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.BASELINE_LEFT));  
         xyitem.setBaseItemLabelGenerator(new StandardXYItemLabelGenerator());  
         xyitem.setBaseItemLabelFont(new Font("Arial", Font.PLAIN, 10));   
-        xyitem.setSeriesPaint(0, new Color(0,128,128));     //设置折线颜色  
-            
+        xyitem.setSeriesPaint(0, new Color(0,128,128));     //设置折线颜色
+
+        
+       
         DateAxis axis = (DateAxis) plot.getDomainAxis();  
         axis.setDateFormatOverride(new SimpleDateFormat("HH:mm:ss")); //设置X轴上日期样式           
           
