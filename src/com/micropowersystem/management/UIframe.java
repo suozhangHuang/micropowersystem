@@ -109,16 +109,34 @@ public class UIframe extends JFrame implements DataHandler{
 	private Vector<TimeSeries> tsVec1P3= new Vector<TimeSeries>();
 	
 	//jPanel[4]
+	private Box boxP4;
+	private JList list0P4;
+	private JList list1P4;
+	private JScrollPane scrollPane0P4;
+	private JScrollPane scrollPane1P4;
+	private JButton addButP4;
+	private JButton removeButP4;
+	private JButton showButP4;
+	
 	private JFreeChart chart0P4;
 	private ChartPanel chartPanel0P4;
 	private JFreeChart chart1P4;
 	private ChartPanel chartPanel1P4;
+	
 	private JLabel[] textLabelP4;
 	private JLabel[] infoLabelP4;
+	
+	private Vector<String> vecForList1P4 = new Vector<String>();
+	private String selectedStr0P4 = null;
+	private String selectedStr1P4 = null;
 	private Vector<TimeSeries> tsVec0P4 = new Vector<TimeSeries>();
 	private Vector<TimeSeries> tsVec1P4 = new Vector<TimeSeries>();
+	
 	private JPanel upPanelP4;
 	private JPanel centerPanelP4;
+	private JPanel centerNorthPanelP4;
+	private JPanel centerCenterPanelP4;
+	private JPanel centerNorthMiddleP4;
 	
 	//jPanel[5]
 	private JFreeChart chartP5;
@@ -172,6 +190,8 @@ public class UIframe extends JFrame implements DataHandler{
 		helpMenuItem = new JMenuItem("说明");
 		emailMenuItem = new JMenuItem("邮件提醒");
 		connectMenuItem = new JMenuItem("连接设备");
+		
+		emailMenuItem.setEnabled(false);
 		
 		helpMenu.add(helpMenuItem);
 		moreMenu.add(connectMenuItem);
@@ -278,7 +298,7 @@ public class UIframe extends JFrame implements DataHandler{
 		//jPanels[2] end
 		
 		//jPanels[3]
-	    jPanels[3].setLayout(new GridLayout(2,1));
+	    jPanels[3].setLayout(new BorderLayout());
 		
 	    upPanel = new JPanel(); 
 	    upPanel.setLayout(new GridLayout(1,3));
@@ -309,7 +329,7 @@ public class UIframe extends JFrame implements DataHandler{
 		
 		boxP3 = Box.createVerticalBox();
 		upMiddlePanel.add(boxP3);
-		boxP3.add(Box.createVerticalStrut(50));    //添加高度为200的垂直框架
+		boxP3.add(Box.createVerticalStrut(10));    //添加高度为200的垂直框架
 		
 	   
 	    boxP3.add(addButP3);
@@ -330,8 +350,8 @@ public class UIframe extends JFrame implements DataHandler{
 		downPanel.add(chartPowerPanelP3);
 		downPanel.add(chartVoltagePanelP3);
 		
-		jPanels[3].add(upPanel);
-		jPanels[3].add(downPanel);
+		jPanels[3].add(upPanel,BorderLayout.NORTH);
+		jPanels[3].add(downPanel,BorderLayout.CENTER);
 		
 		//jPanels[3] end
 		
@@ -340,16 +360,51 @@ public class UIframe extends JFrame implements DataHandler{
 		jPanels[4].setLayout(new BorderLayout());
 		upPanelP4 = new JPanel();
 		centerPanelP4 = new JPanel();
+		centerNorthPanelP4 = new JPanel();
+		centerCenterPanelP4 = new JPanel();
+		centerNorthMiddleP4 = new JPanel();
+		scrollPane0P4 = new JScrollPane();
+		scrollPane1P4 = new JScrollPane();
 		
 		upPanelP4.setLayout(new GridLayout(2,4));
-		centerPanelP4.setLayout(new GridLayout(2,1));
+		centerPanelP4.setLayout(new BorderLayout());
+		centerNorthPanelP4.setLayout(new GridLayout(1,3));
+		centerCenterPanelP4.setLayout(new GridLayout(1,2));
+		
+		list0P4 = new JList();
+		list1P4 = new JList();
+		
+		scrollPane0P4.setViewportView(list0P4);
+		scrollPane1P4.setViewportView(list1P4);
+		
+		addButP4 = new JButton("Add");
+		removeButP4 = new JButton("Remove");
+		showButP4 = new JButton("Show");
+		
+		addButP4.setEnabled(false);
+		removeButP4.setEnabled(false);
+		
+		boxP4 = Box.createVerticalBox();
+		boxP4.add(Box.createVerticalStrut(10));
+		boxP4.add(addButP4);
+		boxP4.add(removeButP4);
+		boxP4.add(showButP4);
+		centerNorthMiddleP4.add(boxP4);
+		
+		centerNorthPanelP4.add(scrollPane0P4);
+		centerNorthPanelP4.add(centerNorthMiddleP4);
+		centerNorthPanelP4.add(scrollPane1P4);
 		
 		chart0P4 = ChartFactory.createTimeSeriesChart( "User Consuming Power", "Time","Power/KW", null, true, false, false);
 		chartPanel0P4 = new ChartPanel(chart0P4);
 		chart1P4 = ChartFactory.createTimeSeriesChart( "Electricity Prices", "Time","Money/Yuan", null, true, false, false);
 		chartPanel1P4 = new ChartPanel(chart1P4);
-		centerPanelP4.add(chartPanel0P4);
-		centerPanelP4.add(chartPanel1P4);
+		centerCenterPanelP4.add(chartPanel0P4);
+		centerCenterPanelP4.add(chartPanel1P4);
+		
+		centerPanelP4.add(centerNorthPanelP4,BorderLayout.NORTH);
+		centerPanelP4.add(centerCenterPanelP4,BorderLayout.CENTER);
+		
 		textLabelP4 = new JLabel[4];
 		infoLabelP4 = new JLabel[4];
 		for(int i = 0;i<4;i++) {
@@ -364,8 +419,12 @@ public class UIframe extends JFrame implements DataHandler{
 			upPanelP4.add(textLabelP4[i]);
 			upPanelP4.add(infoLabelP4[i]);
 		}
+		
 		jPanels[4].add(upPanelP4,BorderLayout.NORTH);
 		jPanels[4].add(centerPanelP4,BorderLayout.CENTER);
+		
+		
+		
 		//jPanels[4] end
 		
 		
@@ -400,7 +459,7 @@ public class UIframe extends JFrame implements DataHandler{
 							voltageTS.add(management.getVoltageTimeSeries(i));
 							TotalPowerTS.add(management.getTotalPowerTimeSeries(i));
 						}
-						
+						emailMenuItem.setEnabled(true);
 						namesVec.add(management.getNames(Management.GENERATOR));
 						namesVec.add(management.getNames(Management.STORAGE));
 						namesVec.add(management.getNames(Management.USER));
@@ -430,10 +489,9 @@ public class UIframe extends JFrame implements DataHandler{
 						//P3
 						list0P3.setListData(namesVec.elementAt(Management.GENERATOR));
 						//P4
-						convertFromMapToVec(powerTS.elementAt(Management.USER),tsVec0P4);
+						list0P4.setListData(namesVec.elementAt(Management.USER));
 						tsVec1P4.add(sellingPriceTS);
 						tsVec1P4.add(buyingPriceTS);
-						DataProcessorTool.setChart(chart0P4,tsVec0P4 , "User Consuming Power", "Power/KW");
 						DataProcessorTool.setChart(chart1P4,tsVec1P4 , "Electricity Prices", "Money/Yuan");
 						//P5
 						convertFromMapToVec(storageEnergyTS,tsVecP5);
@@ -599,6 +657,63 @@ public class UIframe extends JFrame implements DataHandler{
 			
 		});
 		
+		list0P4.addListSelectionListener(new ListSelectionListener() {
+
+			public void valueChanged(ListSelectionEvent e) {
+				if(!list0P4.getValueIsAdjusting()){    //设置只有释放鼠标时才触发
+					addButP4.setEnabled(true);
+					selectedStr0P4 = (String)list0P4.getSelectedValue();
+                }
+			}
+			
+		});
+		
+		list1P4.addListSelectionListener(new ListSelectionListener() {
+
+			public void valueChanged(ListSelectionEvent e) {
+				if(!list1P4.getValueIsAdjusting()){    //设置只有释放鼠标时才触发
+					removeButP4.setEnabled(true);
+					selectedStr1P4 = (String)list1P4.getSelectedValue();
+                }
+			}
+			
+		});
+		
+		addButP4.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				if(!vecForList1P4.contains(selectedStr0P4)) {
+					vecForList1P4.add(selectedStr0P4);
+					list1P4.setListData(vecForList1P4);
+				}
+			}
+			
+		});
+		
+		removeButP4.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				vecForList1P4.remove(selectedStr1P4);
+				list1P4.setListData(vecForList1P4);
+			}
+			
+		});
+		
+		showButP4.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				tsVec0P4.removeAllElements();
+				for(int i = 0;i<vecForList1P4.size();i++) {
+					tsVec0P4.add( powerTS.elementAt(Management.USER).get(vecForList1P4.elementAt(i) ) );
+				}
+				DataProcessorTool.setChart(chart0P4,tsVec0P4 , "Users' Power", "Power/KW");
+			}
+			
+		});
+		
+		
+		
+		
 		helpMenuItem.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -627,10 +742,11 @@ public class UIframe extends JFrame implements DataHandler{
 	}
 	
 	public void OnDataChanged(ArrayList<Double> Prices) {
-		infoLabelP4[0].setText(String.valueOf(Prices.get(0)) );
-		infoLabelP4[1].setText(String.valueOf(Prices.get(2)) );
-		infoLabelP4[2].setText(String.valueOf(Prices.get(1)) );
-		infoLabelP4[3].setText(String.valueOf(Prices.get(3)) );
+		
+		infoLabelP4[0].setText(String.format("%.1f",Prices.get(0))+"元");
+		infoLabelP4[1].setText(String.format("%.1f",Prices.get(2))+"kWh");
+		infoLabelP4[2].setText(String.format("%.1f",Prices.get(1))+"元");
+		infoLabelP4[3].setText(String.format("%.1f",Prices.get(3))+"kWh");
 	}
 	
 }

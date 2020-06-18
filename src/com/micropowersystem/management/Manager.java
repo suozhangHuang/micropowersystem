@@ -420,21 +420,21 @@ public class Manager extends Thread implements Management
 					{
 						if(maxStorageEnergy*0.3 > currentStorageEnergy)
 							users.get(name).setBlackedOut(true);
-						else
+						else if(maxStorageEnergy*0.95 < currentStorageEnergy)
 							users.get(name).setBlackedOut(false);
 					}
 					else if(users.get(name).getType() == User.OFFICE)
 					{
 						if(maxStorageEnergy*0.3 > currentStorageEnergy)
 							users.get(name).setBlackedOut(true);
-						else
+						else if(maxStorageEnergy*0.95 < currentStorageEnergy)
 							users.get(name).setBlackedOut(false);
 					}
 					else if(users.get(name).getType() == User.FAMILY)
 					{
 						if(maxStorageEnergy*0.05 > currentStorageEnergy)
 							users.get(name).setBlackedOut(true);
-						else
+						else  if(maxStorageEnergy*0.3 < currentStorageEnergy)
 							users.get(name).setBlackedOut(false);
 					}
 				}

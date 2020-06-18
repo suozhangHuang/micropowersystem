@@ -20,7 +20,7 @@ public class MainSimulation {
 		g2.setWeatherCondition(w0);
 		
 		Vector<User> uVec = new Vector<User>();
-		for (int i=0;i<20;i++) {
+		for (int i=0;i<25;i++) {
 			User u = new User();
 			u.setAveragePower(5);
 			u.setType(User.FAMILY);
@@ -34,6 +34,16 @@ public class MainSimulation {
 		u = new User();
 		u.setType(User.OFFICE);
 		u.setAveragePower(200);
+		uVec.add(u);
+		
+		u = new User();
+		u.setType(User.OFFICE);
+		u.setAveragePower(300);
+		uVec.add(u);
+		
+		u = new User();
+		u.setType(User.OFFICE);
+		u.setAveragePower(400);
 		uVec.add(u);
 		
 		PowerSystem ps = new PowerSystem();
