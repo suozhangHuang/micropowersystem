@@ -10,7 +10,7 @@ import java.util.Vector;
 import org.jfree.data.time.FixedMillisecond;
 import org.jfree.data.time.TimeSeries;
 
-public class Manager implements Management
+public class Manager extends Thread implements Management
 {
 	public Manager()
 	{
@@ -205,6 +205,14 @@ public class Manager implements Management
 	@Override
 	public void sendEmail()
 	{
+		try
+		{
+			this.email.sendEmail("电网提示信息TITLE", "电网提示信息BODY");
+		} catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println("发送了提醒信息");
 	}
 	
@@ -349,6 +357,9 @@ public class Manager implements Management
 				}
 			}
 			
+			// 标记初始化完成
+			initialized = true;
+			
 			// 休眠并等待下一次的处理
 			try
 			{
@@ -466,5 +477,8 @@ public class Manager implements Management
 	// 与累计收入相关的信息
 	DataHandler dataHandler = null;
 	double accumulatedIncome = 0;
+	
+	// 发送邮件的类
+	Email email = new Email();
 
 }

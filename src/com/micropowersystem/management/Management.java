@@ -31,7 +31,4 @@ public interface Management {
 	
 	public void sendEmail();
 	
-	
-	
-	
 }
