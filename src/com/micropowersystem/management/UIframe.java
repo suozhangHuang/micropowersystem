@@ -25,7 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -51,7 +50,6 @@ public class UIframe extends JFrame implements DataHandler{
 	
 	private JDialog jDialog;
 	private JDialog jHelpDialog;
-	private JDialog jEmailDialog;
 	
 	
 	//jPanel[0]
@@ -62,15 +60,12 @@ public class UIframe extends JFrame implements DataHandler{
 	private JScrollPane scrollPane0P0;
 	private JScrollPane scrollPane1P0;
 	private JScrollPane scrollPane2P0;
-	private JScrollPane scrollPane3P0;
-	private JScrollPane scrollPane4P0;
-	private JScrollPane scrollPane5P0;
 	private JList list0P0;
 	private JList list1P0;
 	private JList list2P0;
-	private JTextArea text0P0;
-	private JTextArea text1P0;
-	private JTextArea text2P0;
+	private JTextField text0P0;
+	private JTextField text1P0;
+	private JTextField text2P0;
 	
 	//jPanel[1]
 	private JFreeChart chartP1;
@@ -235,28 +230,20 @@ public class UIframe extends JFrame implements DataHandler{
 		scrollPane1P0.setViewportView(list1P0);
 		scrollPane2P0.setViewportView(list2P0);
 		
-		text0P0 = new JTextArea();
-		text1P0 = new JTextArea();
-		text2P0 = new JTextArea();
+		text0P0 = new JTextField();
+		text1P0 = new JTextField();
+		text2P0 = new JTextField();
 		
-		text0P0.setLineWrap(true);
-		text1P0.setLineWrap(true);
-		text2P0.setLineWrap(true);
-		
-		text0P0.setText("选择\n设备以获取详细信息00000000000000000000000000000");
+		text0P0.setText("选择设备以获取详细信息");
 		text1P0.setText("选择设备以获取详细信息");
 		text2P0.setText("选择设备以获取详细信息");
-		
-		scrollPane3P0 = new JScrollPane(text0P0);
-		scrollPane4P0 = new JScrollPane(text1P0);
-		scrollPane5P0 = new JScrollPane(text2P0);
 		
 		mainPanelP0.add(scrollPane0P0);
 		mainPanelP0.add(scrollPane1P0);
 		mainPanelP0.add(scrollPane2P0);
-		mainPanelP0.add(scrollPane3P0);
-		mainPanelP0.add(scrollPane4P0);
-		mainPanelP0.add(scrollPane5P0);
+		mainPanelP0.add(text0P0);
+		mainPanelP0.add(text1P0);
+		mainPanelP0.add(text2P0);
 		
 		
 		jPanels[0].add(infoPanelP0,BorderLayout.NORTH);
@@ -460,48 +447,7 @@ public class UIframe extends JFrame implements DataHandler{
 		emailMenuItem.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
-				jEmailDialog = new JDialog();
-				JPanel tempUpPanel = new JPanel();
-				JPanel tempDownPanel = new JPanel();
-				tempUpPanel.setLayout(new GridLayout(1,2));
-				JLabel tempLabel0 = new JLabel();
-				tempLabel0.setText("请输入您想发送的邮箱地址：");
-				JLabel tempLabel1 = new JLabel();
-				JButton tempBut = new JButton("SEND");
-				Box tempBox = Box.createVerticalBox();
-				JTextField tempTF = new JTextField();
-				tempTF.setEditable(true);
-				tempBox.createVerticalStrut(50);
-				tempBox.createHorizontalStrut(100);
-				tempBox.add(tempBut);
-				tempBox.add(tempLabel1);
-				tempUpPanel.add(tempLabel0);
-				tempUpPanel.add(tempTF);
-				tempBut.addActionListener(new ActionListener() {
-
-					public void actionPerformed(ActionEvent arg0) {
-						String tempStr = tempTF.getText();
-						boolean flag = false;
-						if(tempStr!=null) {
-							flag = management.sendEmail(tempStr);
-							if(flag) {
-								tempLabel1.setText("传送成功");
-							}else {
-								tempLabel1.setText("传送失败");
-							}
-						}else {
-							tempLabel1.setText("传送失败或未输入邮箱地址");
-						}
-					}
-					
-				});
-				tempDownPanel.add(tempBox);
-				jEmailDialog.setSize(200,150);
-				jEmailDialog.setLocation(400, 300);
-				jEmailDialog.setLayout(new BorderLayout());
-				jEmailDialog.add(tempUpPanel,BorderLayout.NORTH);
-				jEmailDialog.add(tempDownPanel,BorderLayout.CENTER);
-				jEmailDialog.setVisible(true);
+				management.sendEmail("huangjl17@mails.tsinghua.edu.cn");
 			}
 			
 		});
@@ -514,7 +460,6 @@ public class UIframe extends JFrame implements DataHandler{
 					String tempStr = (String)list0P0.getSelectedValue();
 					String tempValue = infoVec.elementAt(0).get(tempStr);
 					text0P0.setText(tempValue);
-					
                 }
 			}
 			
@@ -526,7 +471,7 @@ public class UIframe extends JFrame implements DataHandler{
 				if(!list1P0.getValueIsAdjusting()){    //设置只有释放鼠标时才触发
 					String tempStr = (String)list1P0.getSelectedValue();
 					String tempValue = infoVec.elementAt(1).get(tempStr);
-					text1P0.setText(tempValue);
+					text0P0.setText(tempValue);
                 }
 			}
 			
@@ -538,7 +483,7 @@ public class UIframe extends JFrame implements DataHandler{
 				if(!list2P0.getValueIsAdjusting()){    //设置只有释放鼠标时才触发
 					String tempStr = (String)list2P0.getSelectedValue();
 					String tempValue = infoVec.elementAt(2).get(tempStr);
-					text2P0.setText(tempValue);
+					text0P0.setText(tempValue);
                 }
 			}
 			
