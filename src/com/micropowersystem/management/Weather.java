@@ -140,9 +140,9 @@ public class Weather extends Thread
 		if((timeInHour>6&&timeInHour<=7)||(timeInHour>19&&timeInHour<=20))
 			return Math.pow(Math.sin(theta),2)*1200;
 		if((timeInHour>7&&timeInHour<=10)||(timeInHour>16&&timeInHour<=19))
-			return 1.3901*Math.pow(Math.sin(theta),2)*1200-0.0868*Math.asin(theta)*1200;
+			return 1.3901*Math.pow(Math.sin(theta),2)*1200-0.0868*Math.sin(theta)*1200;
 		if((timeInHour>10&&timeInHour<=16))
-			return Math.asin(theta)*1200;
+			return Math.sin(theta)*1200;
 		return 0;
 	}
 	public double getVisibility(long time)
@@ -183,13 +183,13 @@ public class Weather extends Thread
 			
 			
 			
-			this.temperature = getTemperature(timestamp%(24*60*60*1000));
-			this.humidity = getHumidity(timestamp%(24*60*60*1000));
-			this.cloudness = getCloudness(timestamp%(24*60*60*1000));
-			this.pressure = getPressure(timestamp%(24*60*60*1000));
-			this.Radiancy = getRadiancy(timestamp%(24*60*60*1000));
-			this.visibility = getVisibility(timestamp%(24*60*60*1000));
-			this.windSpeed = getWindSpeed(timestamp%(24*60*60*1000));
+			this.temperature = getTemperature((timestamp+8*60*60*1000)%(24*60*60*1000));
+			this.humidity = getHumidity((timestamp+8*60*60*1000)%(24*60*60*1000));
+			this.cloudness = getCloudness((timestamp+8*60*60*1000)%(24*60*60*1000));
+			this.pressure = getPressure((timestamp+8*60*60*1000)%(24*60*60*1000));
+			this.Radiancy = getRadiancy((timestamp+8*60*60*1000)%(24*60*60*1000));
+			this.visibility = getVisibility((timestamp+8*60*60*1000)%(24*60*60*1000));
+			this.windSpeed = getWindSpeed((timestamp+8*60*60*1000)%(24*60*60*1000));
 			
 			// 休眠一段时间再进行刷新
 			

@@ -25,6 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -50,7 +51,7 @@ public class UIframe extends JFrame implements DataHandler{
 	
 	private JDialog jDialog;
 	private JDialog jHelpDialog;
-	
+	private JDialog jEmailDialog;
 	
 	//jPanel[0]
 	private JPanel infoPanelP0;
@@ -60,12 +61,15 @@ public class UIframe extends JFrame implements DataHandler{
 	private JScrollPane scrollPane0P0;
 	private JScrollPane scrollPane1P0;
 	private JScrollPane scrollPane2P0;
+	private JScrollPane scrollPane3P0;
+	private JScrollPane scrollPane4P0;
+	private JScrollPane scrollPane5P0;
 	private JList list0P0;
 	private JList list1P0;
 	private JList list2P0;
-	private JTextField text0P0;
-	private JTextField text1P0;
-	private JTextField text2P0;
+	private JTextArea text0P0;
+	private JTextArea text1P0;
+	private JTextArea text2P0;
 	
 	//jPanel[1]
 	private JFreeChart chartP1;
@@ -142,7 +146,7 @@ public class UIframe extends JFrame implements DataHandler{
 	
 	
 	public UIframe() {
-		super("Î¢µçÍø¹ÜÀíÏµÍ³");
+		super("å¾®ç”µç½‘ç®¡ç†ç³»ç»Ÿ");
 	}
 	
 	public UIframe(String UIName) {
@@ -160,14 +164,14 @@ public class UIframe extends JFrame implements DataHandler{
 	
 	private void setupComponents() {
 		
-		//³õÊ¼»¯BarÇøÓò
+		//åˆå§‹åŒ–BaråŒºåŸŸ
 		menuBar = new JMenuBar();
 		
-		helpMenu = new JMenu("°ïÖú");
-		moreMenu = new JMenu("¸ü¶à");
-		helpMenuItem = new JMenuItem("ËµÃ÷");
-		emailMenuItem = new JMenuItem("ÓÊ¼şÌáĞÑ");
-		connectMenuItem = new JMenuItem("Á¬½ÓÉè±¸");
+		helpMenu = new JMenu("å¸®åŠ©");
+		moreMenu = new JMenu("æ›´å¤š");
+		helpMenuItem = new JMenuItem("è¯´æ˜");
+		emailMenuItem = new JMenuItem("é‚®ä»¶æé†’");
+		connectMenuItem = new JMenuItem("è¿æ¥è®¾å¤‡");
 		
 		helpMenu.add(helpMenuItem);
 		moreMenu.add(connectMenuItem);
@@ -176,7 +180,7 @@ public class UIframe extends JFrame implements DataHandler{
 		menuBar.add(moreMenu);
 		menuBar.add(helpMenu);
 		
-		//³õÊ¼»¯jTabbedPane
+		//åˆå§‹åŒ–jTabbedPane
 		jTabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		jPanels = new JPanel[6];
 		jPanels[0] = new JPanel();
@@ -185,15 +189,15 @@ public class UIframe extends JFrame implements DataHandler{
 		jPanels[3] = new JPanel();
 		jPanels[4] = new JPanel();
 		jPanels[5] = new JPanel();
-		jTabbedPane.add("Éè±¸ĞÅÏ¢",jPanels[0]);
-		jTabbedPane.add("ÔËĞĞ×´¿ö",jPanels[1]);
-		jTabbedPane.add("·¢µçÔ¤²â",jPanels[2]);
-		jTabbedPane.add("·¢µç×´¿ö",jPanels[3]);
-		jTabbedPane.add("ÓÃ»§×´¿ö",jPanels[4]);
-		jTabbedPane.add("´¢ÄÜ×´¿ö",jPanels[5]);
+		jTabbedPane.add("è®¾å¤‡ä¿¡æ¯",jPanels[0]);
+		jTabbedPane.add("è¿è¡ŒçŠ¶å†µ",jPanels[1]);
+		jTabbedPane.add("å‘ç”µé¢„æµ‹",jPanels[2]);
+		jTabbedPane.add("å‘ç”µçŠ¶å†µ",jPanels[3]);
+		jTabbedPane.add("ç”¨æˆ·çŠ¶å†µ",jPanels[4]);
+		jTabbedPane.add("å‚¨èƒ½çŠ¶å†µ",jPanels[5]);
 		
 		
-		//·Ö±ğ³õÊ¼»¯¸÷¸öTabbedPanel
+		//åˆ†åˆ«åˆå§‹åŒ–å„ä¸ªTabbedPanel
 		//Panels[0]
 		infoPanelP0 = new JPanel();
 		infoPanelP0.setLayout(new GridLayout(1,0));
@@ -203,9 +207,9 @@ public class UIframe extends JFrame implements DataHandler{
 			textLabelP0[i] = new JLabel();
 			infoLabelP0[i] = new JLabel();
 		}
-		textLabelP0[0].setText("·¢µçÉè±¸ÊıÁ¿£º");
-		textLabelP0[1].setText("´¢ÄÜÉè±¸ÊıÁ¿£º");
-		textLabelP0[2].setText("ÓÃ»§ÊıÁ¿£º");
+		textLabelP0[0].setText("å‘ç”µè®¾å¤‡æ•°é‡ï¼š");
+		textLabelP0[1].setText("å‚¨èƒ½è®¾å¤‡æ•°é‡ï¼š");
+		textLabelP0[2].setText("ç”¨æˆ·æ•°é‡ï¼š");
 		for(int i = 0;i<3;i++) {
 			infoPanelP0.add(textLabelP0[i]);
 			infoPanelP0.add(infoLabelP0[i]);
@@ -230,20 +234,28 @@ public class UIframe extends JFrame implements DataHandler{
 		scrollPane1P0.setViewportView(list1P0);
 		scrollPane2P0.setViewportView(list2P0);
 		
-		text0P0 = new JTextField();
-		text1P0 = new JTextField();
-		text2P0 = new JTextField();
+		text0P0 = new JTextArea();
+		text1P0 = new JTextArea();
+		text2P0 = new JTextArea();
 		
-		text0P0.setText("Ñ¡ÔñÉè±¸ÒÔ»ñÈ¡ÏêÏ¸ĞÅÏ¢");
-		text1P0.setText("Ñ¡ÔñÉè±¸ÒÔ»ñÈ¡ÏêÏ¸ĞÅÏ¢");
-		text2P0.setText("Ñ¡ÔñÉè±¸ÒÔ»ñÈ¡ÏêÏ¸ĞÅÏ¢");
+		text0P0.setText("é€‰æ‹©è®¾å¤‡ä»¥è·å–è¯¦ç»†ä¿¡æ¯");
+		text1P0.setText("é€‰æ‹©è®¾å¤‡ä»¥è·å–è¯¦ç»†ä¿¡æ¯");
+		text2P0.setText("é€‰æ‹©è®¾å¤‡ä»¥è·å–è¯¦ç»†ä¿¡æ¯");
+		
+		text0P0.setLineWrap(true);
+		text1P0.setLineWrap(true);
+		text2P0.setLineWrap(true);
+		
+		scrollPane3P0 = new JScrollPane(text0P0);
+		scrollPane4P0 = new JScrollPane(text1P0);
+		scrollPane5P0 = new JScrollPane(text2P0);
 		
 		mainPanelP0.add(scrollPane0P0);
 		mainPanelP0.add(scrollPane1P0);
 		mainPanelP0.add(scrollPane2P0);
-		mainPanelP0.add(text0P0);
-		mainPanelP0.add(text1P0);
-		mainPanelP0.add(text2P0);
+		mainPanelP0.add(scrollPane3P0);
+		mainPanelP0.add(scrollPane4P0);
+		mainPanelP0.add(scrollPane5P0);
 		
 		
 		jPanels[0].add(infoPanelP0,BorderLayout.NORTH);
@@ -289,7 +301,7 @@ public class UIframe extends JFrame implements DataHandler{
 		removeButP3 = new JButton("Remove");
 		showButP3 = new JButton("Show");
 		
-		//²»ÖªµÀÔõÃ´ÊµÏÖ°´Å¥´óĞ¡Ò»ÖÂ
+		//ä¸çŸ¥é“æ€ä¹ˆå®ç°æŒ‰é’®å¤§å°ä¸€è‡´
 		
 		
 		addButP3.setEnabled(false);
@@ -297,7 +309,7 @@ public class UIframe extends JFrame implements DataHandler{
 		
 		boxP3 = Box.createVerticalBox();
 		upMiddlePanel.add(boxP3);
-		boxP3.add(Box.createVerticalStrut(50));    //Ìí¼Ó¸ß¶ÈÎª200µÄ´¹Ö±¿ò¼Ü
+		boxP3.add(Box.createVerticalStrut(50));    //æ·»åŠ é«˜åº¦ä¸º200çš„å‚ç›´æ¡†æ¶
 		
 	   
 	    boxP3.add(addButP3);
@@ -344,10 +356,10 @@ public class UIframe extends JFrame implements DataHandler{
 			textLabelP4[i] = new JLabel();
 			infoLabelP4[i] = new JLabel();
 		}
-		textLabelP4[0].setText("ÒÑÊÛµç¼Û£º");
-		textLabelP4[1].setText("ÒÑÊÛµçÁ¿£º");
-		textLabelP4[2].setText("ÒÑ¹ºµç¼Û£º");
-		textLabelP4[3].setText("ÒÑ¹ºµçÁ¿£º");
+		textLabelP4[0].setText("å·²å”®ç”µä»·ï¼š");
+		textLabelP4[1].setText("å·²å”®ç”µé‡ï¼š");
+		textLabelP4[2].setText("å·²è´­ç”µä»·ï¼š");
+		textLabelP4[3].setText("å·²è´­ç”µé‡ï¼š");
 		for(int i=0;i<4;i++) {
 			upPanelP4.add(textLabelP4[i]);
 			upPanelP4.add(infoLabelP4[i]);
@@ -379,10 +391,10 @@ public class UIframe extends JFrame implements DataHandler{
 				managementStatus = management.getManagerStatus();
 				String tempText = null;
 				if(managementStatus == true) {
-					tempText = "ÒÑ¾­ÓëÉè±¸Á¬½Ó³É¹¦£¡";
-					//Á¬½Ó³É¹¦ºó£¬¼´¿ÉÒÔ¿ªÊ¼½øĞĞÊı¾İµÄ¹ØÁª
+					tempText = "å·²ç»ä¸è®¾å¤‡è¿æ¥æˆåŠŸï¼";
+					//è¿æ¥æˆåŠŸåï¼Œå³å¯ä»¥å¼€å§‹è¿›è¡Œæ•°æ®çš„å…³è”
 					if(!dataConnected) {
-						//½øĞĞÊı¾İÁ¬½Ó
+						//è¿›è¡Œæ•°æ®è¿æ¥
 						for (int i = 0;i<4;i++) {
 							powerTS.add(management.getPowerTimeSeries(i));
 							voltageTS.add(management.getVoltageTimeSeries(i));
@@ -402,14 +414,14 @@ public class UIframe extends JFrame implements DataHandler{
 						sellingPriceTS = management.getPrices(Management.USER);
 						buyingPriceTS = management.getPrices(Management.POWERSYSTEM);
 						forecastPowerTS = management.getForecastPower();
-						//ÉèÖÃUIÓĞ¹ØÊı¾İ
+						//è®¾ç½®UIæœ‰å…³æ•°æ®
 						list0P0.setListData(namesVec.elementAt(0));
 						list1P0.setListData(namesVec.elementAt(1));
 						list2P0.setListData(namesVec.elementAt(2));
 						infoLabelP0[0].setText(String.valueOf(namesVec.elementAt(0).size()));
 						infoLabelP0[1].setText(String.valueOf(namesVec.elementAt(1).size()));
 						infoLabelP0[2].setText(String.valueOf(namesVec.elementAt(2).size()));
-						//ÉèÖÃÓëÍ¼Æ¬ÓĞ¹ØµÄÊı¾İ¹ØÁª
+						//è®¾ç½®ä¸å›¾ç‰‡æœ‰å…³çš„æ•°æ®å…³è”
 						//P1
 						DataProcessorTool.setChart(chartP1,TotalPowerTS , "Total Power of Different Sides", "Power/KW");
 						//P2
@@ -430,7 +442,7 @@ public class UIframe extends JFrame implements DataHandler{
 						dataConnected = true;
 					}
 				}else {
-					tempText = "Î´Á¬½Ó³É¹¦£¬ÇëÉÔºóÔÙÊÔ£¡";
+					tempText = "æœªè¿æ¥æˆåŠŸï¼Œè¯·ç¨åå†è¯•ï¼";
 				}
 				jDialog = new JDialog();
 				jDialog.setSize(200,150);
@@ -447,7 +459,48 @@ public class UIframe extends JFrame implements DataHandler{
 		emailMenuItem.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
-				management.sendEmail("huangjl17@mails.tsinghua.edu.cn");
+				jEmailDialog = new JDialog();
+				JPanel tempUpPanel = new JPanel();
+				JPanel tempDownPanel = new JPanel();
+				tempUpPanel.setLayout(new GridLayout(1,2));
+				JLabel tempLabel0 = new JLabel();
+				tempLabel0.setText("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë·¢ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½");
+				JLabel tempLabel1 = new JLabel();
+				JButton tempBut = new JButton("SEND");
+				Box tempBox = Box.createVerticalBox();
+				JTextField tempTF = new JTextField();
+				tempTF.setEditable(true);
+				tempBox.createVerticalStrut(50);
+				tempBox.createHorizontalStrut(100);
+				tempBox.add(tempBut);
+				tempBox.add(tempLabel1);
+				tempUpPanel.add(tempLabel0);
+				tempUpPanel.add(tempTF);
+				tempBut.addActionListener(new ActionListener() {
+
+					public void actionPerformed(ActionEvent arg0) {
+						String tempStr = tempTF.getText();
+						boolean flag = false;
+						if(tempStr!=null) {
+							flag = management.sendEmail(tempStr);
+							if(flag) {
+								tempLabel1.setText("ï¿½ï¿½ï¿½Í³É¹ï¿½");
+							}else {
+								tempLabel1.setText("ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½");
+							}
+						}else {
+							tempLabel1.setText("ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ü»ï¿½Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·");
+						}
+					}
+					
+				});
+				tempDownPanel.add(tempBox);
+				jEmailDialog.setSize(200,150);
+				jEmailDialog.setLocation(400, 300);
+				jEmailDialog.setLayout(new BorderLayout());
+				jEmailDialog.add(tempUpPanel,BorderLayout.NORTH);
+				jEmailDialog.add(tempDownPanel,BorderLayout.CENTER);
+				jEmailDialog.setVisible(true);
 			}
 			
 		});
@@ -456,7 +509,7 @@ public class UIframe extends JFrame implements DataHandler{
 		list0P0.addListSelectionListener(new ListSelectionListener() {
 
 			public void valueChanged(ListSelectionEvent e) {
-				if(!list0P0.getValueIsAdjusting()){    //ÉèÖÃÖ»ÓĞÊÍ·ÅÊó±êÊ±²Å´¥·¢
+				if(!list0P0.getValueIsAdjusting()){    //è®¾ç½®åªæœ‰é‡Šæ”¾é¼ æ ‡æ—¶æ‰è§¦å‘
 					String tempStr = (String)list0P0.getSelectedValue();
 					String tempValue = infoVec.elementAt(0).get(tempStr);
 					text0P0.setText(tempValue);
@@ -468,10 +521,10 @@ public class UIframe extends JFrame implements DataHandler{
 		list1P0.addListSelectionListener(new ListSelectionListener() {
 
 			public void valueChanged(ListSelectionEvent e) {
-				if(!list1P0.getValueIsAdjusting()){    //ÉèÖÃÖ»ÓĞÊÍ·ÅÊó±êÊ±²Å´¥·¢
+				if(!list1P0.getValueIsAdjusting()){    //è®¾ç½®åªæœ‰é‡Šæ”¾é¼ æ ‡æ—¶æ‰è§¦å‘
 					String tempStr = (String)list1P0.getSelectedValue();
 					String tempValue = infoVec.elementAt(1).get(tempStr);
-					text0P0.setText(tempValue);
+					text1P0.setText(tempValue);
                 }
 			}
 			
@@ -480,10 +533,10 @@ public class UIframe extends JFrame implements DataHandler{
 		list2P0.addListSelectionListener(new ListSelectionListener() {
 
 			public void valueChanged(ListSelectionEvent e) {
-				if(!list2P0.getValueIsAdjusting()){    //ÉèÖÃÖ»ÓĞÊÍ·ÅÊó±êÊ±²Å´¥·¢
+				if(!list2P0.getValueIsAdjusting()){    //è®¾ç½®åªæœ‰é‡Šæ”¾é¼ æ ‡æ—¶æ‰è§¦å‘
 					String tempStr = (String)list2P0.getSelectedValue();
 					String tempValue = infoVec.elementAt(2).get(tempStr);
-					text0P0.setText(tempValue);
+					text2P0.setText(tempValue);
                 }
 			}
 			
@@ -492,7 +545,7 @@ public class UIframe extends JFrame implements DataHandler{
 		list0P3.addListSelectionListener(new ListSelectionListener() {
 
 			public void valueChanged(ListSelectionEvent e) {
-				if(!list0P3.getValueIsAdjusting()){    //ÉèÖÃÖ»ÓĞÊÍ·ÅÊó±êÊ±²Å´¥·¢
+				if(!list0P3.getValueIsAdjusting()){    //è®¾ç½®åªæœ‰é‡Šæ”¾é¼ æ ‡æ—¶æ‰è§¦å‘
 					addButP3.setEnabled(true);
 					selectedStr0P3 = (String)list0P3.getSelectedValue();
                 }
@@ -503,7 +556,7 @@ public class UIframe extends JFrame implements DataHandler{
 		list1P3.addListSelectionListener(new ListSelectionListener() {
 
 			public void valueChanged(ListSelectionEvent e) {
-				if(!list1P3.getValueIsAdjusting()){    //ÉèÖÃÖ»ÓĞÊÍ·ÅÊó±êÊ±²Å´¥·¢
+				if(!list1P3.getValueIsAdjusting()){    //è®¾ç½®åªæœ‰é‡Šæ”¾é¼ æ ‡æ—¶æ‰è§¦å‘
 					removeButP3.setEnabled(true);
 					selectedStr1P3 = (String)list1P3.getSelectedValue();
                 }
@@ -554,7 +607,7 @@ public class UIframe extends JFrame implements DataHandler{
 				jHelpDialog.setLocation(400, 300);
 				jHelpDialog.setLayout(new BorderLayout());
 				JLabel tempLabel = new JLabel();
-				tempLabel.setText("°æÈ¨ËùÓĞ:Ğíº­£¬»Æ¿¡Á¦"+"      °æ±¾0.0");
+				tempLabel.setText("ç‰ˆæƒæ‰€æœ‰:è®¸æ¶µï¼Œé»„ä¿ŠåŠ›"+"      ç‰ˆæœ¬0.0");
 				jHelpDialog.add(tempLabel,BorderLayout.CENTER);
 				jHelpDialog.setVisible(true);
 			}
