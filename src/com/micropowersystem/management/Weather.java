@@ -76,7 +76,7 @@ public class Weather extends Thread
 	{
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date(time));
-		double timeInHour = calendar.get(Calendar.HOUR_OF_DAY) + calendar.get(Calendar.HOUR_OF_DAY)/60.0;
+		double timeInHour = calendar.get(Calendar.HOUR_OF_DAY) + calendar.get(Calendar.MINUTE)/60.0;
 		double temperature = 0;
 		
 		if(timeInHour>=0 && timeInHour<=4)
@@ -110,7 +110,7 @@ public class Weather extends Thread
 	{
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date(time));
-		double timeInHour = calendar.get(Calendar.HOUR_OF_DAY) + calendar.get(Calendar.HOUR_OF_DAY)/60.0;
+		double timeInHour = calendar.get(Calendar.HOUR_OF_DAY) + calendar.get(Calendar.MINUTE)/60.0;
 		double cloudness = 0;
 		
 		if(timeInHour>=0 && timeInHour<=4)
@@ -142,16 +142,16 @@ public class Weather extends Thread
 	{
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date(time));
-		double timeInHour = calendar.get(Calendar.HOUR_OF_DAY) + calendar.get(Calendar.HOUR_OF_DAY)/60.0;
+		double timeInHour = calendar.get(Calendar.HOUR_OF_DAY) + calendar.get(Calendar.MINUTE)/60.0;
 		double theta = 3.1415926/14*(timeInHour-6);
 		if((timeInHour>=0&&timeInHour<=6)||(timeInHour>20&&timeInHour<=24))
 			return 0;
 		if((timeInHour>6&&timeInHour<=7)||(timeInHour>19&&timeInHour<=20))
 			return Math.pow(Math.sin(theta),2)*1200;
 		if((timeInHour>7&&timeInHour<=10)||(timeInHour>16&&timeInHour<=19))
-			return 1.3901*Math.pow(Math.sin(theta),2)*1200-0.0868*Math.asin(theta)*1200;
+			return 1.3901*Math.pow(Math.sin(theta),2)*1200-0.0868*Math.sin(theta)*1200;
 		if((timeInHour>10&&timeInHour<=16))
-			return Math.asin(theta)*1200;
+			return Math.sin(theta)*1200;
 		return 0;
 	}
 	public double getVisibility(long time)
@@ -162,7 +162,7 @@ public class Weather extends Thread
 	{
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date(time));
-		double timeInHour = calendar.get(Calendar.HOUR_OF_DAY) + calendar.get(Calendar.HOUR_OF_DAY)/60.0;
+		double timeInHour = calendar.get(Calendar.HOUR_OF_DAY) + calendar.get(Calendar.MINUTE)/60.0;
 		double ws = 0;
 		if(timeInHour>=0&&timeInHour<4)
 			ws = 5;
