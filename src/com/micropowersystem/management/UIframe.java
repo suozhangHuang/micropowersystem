@@ -464,7 +464,7 @@ public class UIframe extends JFrame implements DataHandler{
 				JPanel tempDownPanel = new JPanel();
 				tempUpPanel.setLayout(new GridLayout(1,2));
 				JLabel tempLabel0 = new JLabel();
-				tempLabel0.setText("���������뷢�͵������ַ��");
+				tempLabel0.setText("请输入您想要发送的邮箱地址：");
 				JLabel tempLabel1 = new JLabel();
 				JButton tempBut = new JButton("SEND");
 				Box tempBox = Box.createVerticalBox();
@@ -484,12 +484,12 @@ public class UIframe extends JFrame implements DataHandler{
 						if(tempStr!=null) {
 							flag = management.sendEmail(tempStr);
 							if(flag) {
-								tempLabel1.setText("���ͳɹ�");
+								tempLabel1.setText("发送成功");
 							}else {
-								tempLabel1.setText("����ʧ��");
+								tempLabel1.setText("发送失败");
 							}
 						}else {
-							tempLabel1.setText("����ʧ�ܻ�δ���������ַ");
+							tempLabel1.setText("请输入邮箱地址再发送ַ");
 						}
 					}
 					
