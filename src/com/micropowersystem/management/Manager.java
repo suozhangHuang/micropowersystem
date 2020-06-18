@@ -1,14 +1,14 @@
 package com.micropowersystem.management;
 
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Vector;
 
-import org.jfree.data.time.FixedMillisecond;
-import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.*;
 
 public class Manager extends Thread implements Management
 {
@@ -228,6 +228,7 @@ public class Manager extends Thread implements Management
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
 		return true; 
 	}
@@ -245,9 +246,18 @@ public class Manager extends Thread implements Management
 			// 获得当前的时间
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(new Date(timestamp));
+			RegularTimePeriod regularTimePeriod = new FixedMillisecond(timestamp);
+			
+			System.out.printf("weather:%.3f %.3f %.3f %.3f %.3f %.3f %.3f ", 
+					weather.getCloudness(),
+					weather.getHumidity(),
+					weather.getPressure(), 
+					weather.getRadiancy(),
+					weather.getTemperature(),
+					weather.getVisibility(),
+					weather.getWindSpeed());
 			
 			// 计算休眠时间内的电能变化
-			
 			// 发电机的电能用输出来表示
 			double totalEnergyGenerator = 0;
 			double totalPowerGenerator = 0;
@@ -256,12 +266,14 @@ public class Manager extends Thread implements Management
 				double generated = generators.get(name).getWattHour() - energyMeters.get(name);
 				energyMeters.put(name, generators.get(name).getWattHour());
 
-				generatorVoltage.get(name).add(new FixedMillisecond(timestamp), generators.get(name).getVoltage(Generator.REALTIME));
-				generatorPower.get(name).add(new FixedMillisecond(timestamp), generators.get(name).getPower(Generator.REALTIME));
+				generatorVoltage.get(name).add(regularTimePeriod, generators.get(name).getVoltage(Generator.REALTIME));
+				generatorPower.get(name).add(regularTimePeriod, generators.get(name).getPower(Generator.REALTIME));
 				totalPowerGenerator += generators.get(name).getPower(Generator.REALTIME);
 				totalEnergyGenerator += generated;
+				System.out.printf("%s:%f ", name, generators.get(name).getPower(Generator.REALTIME));
 			}
-			totalPower.get(GENERATOR).add(new FixedMillisecond(timestamp), totalPowerGenerator);
+			System.out.printf("\n");
+			totalPower.get(GENERATOR).add(regularTimePeriod, totalPowerGenerator);
 			
 			// 用户的电能用输入来表示
 			double totalEnergyUser = 0;
@@ -271,12 +283,12 @@ public class Manager extends Thread implements Management
 				double consumed = users.get(name).getWattHour() - energyMeters.get(name);
 				energyMeters.put(name, users.get(name).getWattHour());
 
-				userVoltage.get(name).add(new FixedMillisecond(timestamp), 220);
-				userPower.get(name).add(new FixedMillisecond(timestamp), users.get(name).getPower());
+				userVoltage.get(name).add(regularTimePeriod, 220);
+				userPower.get(name).add(regularTimePeriod, users.get(name).getPower());
 				totalPowerUser += users.get(name).getPower();
 				totalEnergyUser += consumed;
 			}
-			totalPower.get(USER).add(new FixedMillisecond(timestamp), totalPowerUser);
+			totalPower.get(USER).add(regularTimePeriod, totalPowerUser);
 			
 			// 储能装置的电能用输入来表示
 			double totalEnergyStorage = 0;
@@ -286,19 +298,19 @@ public class Manager extends Thread implements Management
 				double input = storages.get(name).getCurrentEnergy() - energyMeters.get(name);
 				energyMeters.put(name, storages.get(name).getCurrentEnergy());
 				
-				storageEnergy.get(name).add(new FixedMillisecond(timestamp), storages.get(name).getCurrentEnergy());
-				storageVoltage.get(name).add(new FixedMillisecond(timestamp), 220);
-				storagePower.get(name).add(new FixedMillisecond(timestamp), storages.get(name).getInputPower());
+				storageEnergy.get(name).add(regularTimePeriod, storages.get(name).getCurrentEnergy());
+				storageVoltage.get(name).add(regularTimePeriod, 220);
+				storagePower.get(name).add(regularTimePeriod, storages.get(name).getInputPower());
 				totalPowerStorage += storages.get(name).getInputPower();
 				totalEnergyStorage += input;
 			}
-			totalPower.get(STORAGE).add(new FixedMillisecond(timestamp), totalPowerStorage);
+			totalPower.get(STORAGE).add(regularTimePeriod, totalPowerStorage);
 			
 			// 计算从电网输入的能量，并计算对应的电费
 			double totalEnergyPowerSystem = totalEnergyStorage + totalEnergyUser - totalEnergyGenerator;
 			double totalPowerPowerSystem = totalPowerStorage + totalPowerUser - totalPowerGenerator;
-			powerSystemVoltage.get("PowerSystem").add(new FixedMillisecond(timestamp), 220);
-			powerSystemPower.get("PowerSystem").add(new FixedMillisecond(timestamp), totalPowerPowerSystem);
+			powerSystemVoltage.get("PowerSystem").add(regularTimePeriod, 220);
+			powerSystemPower.get("PowerSystem").add(regularTimePeriod, totalPowerPowerSystem);
 			if(totalEnergyPowerSystem>0)
 			{
 				accumulatedInputEnergy += totalEnergyPowerSystem;
@@ -320,8 +332,8 @@ public class Manager extends Thread implements Management
 			}
 			
 			// 统计电价信息
-			buyingPrice.add(new FixedMillisecond(timestamp), powerSystem.getBuyingPrice());
-			sellingPrice.add(new FixedMillisecond(timestamp), powerSystem.getSellingPrice());
+			buyingPrice.add(regularTimePeriod, powerSystem.getBuyingPrice());
+			sellingPrice.add(regularTimePeriod, powerSystem.getSellingPrice());
 			
 			if(pointCount < maxPointCount)
 			{
@@ -341,11 +353,6 @@ public class Manager extends Thread implements Management
 			
 			// 分配下一时间段的储能装置策略
 			// 价格低于平均
-			System.out.printf("avgSP:%f avgBP:%f SP:%f BP:%f\n", 
-					avgSellingPrice, 
-					avgBuyingPrice, 
-					powerSystem.getSellingPrice(), 
-					powerSystem.getBuyingPrice());
 			if(avgSellingPrice > powerSystem.getBuyingPrice()*STOP_CONSUMING_RATIO)
 			{
 				// 如果价格远低于平均，那么就买电

@@ -60,7 +60,7 @@ public class PowerSystem extends Thread
 				
 				price *= 0.5*Math.abs(calendar.get(Calendar.MONTH) - 6.5)/(6.5);
 				
-				if(calendar.get(Calendar.HOUR) < 8 || calendar.get(Calendar.HOUR) > 18)
+				if(calendar.get(Calendar.HOUR_OF_DAY) < 8 || calendar.get(Calendar.HOUR_OF_DAY) > 18)
 					price *= 1;
 				else
 					price *= 2;

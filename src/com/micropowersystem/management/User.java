@@ -103,7 +103,7 @@ public class User extends Thread
 					// 模拟办公场所的用电情况，工作时间均匀用电
 					// 取50W/m^2, 2000m^2
 					// 夏季时80W/m^2 
-					if(calendar.get(Calendar.HOUR) >= 8 && calendar.get(Calendar.HOUR) <= 18)
+					if(calendar.get(Calendar.HOUR_OF_DAY) >= 8 && calendar.get(Calendar.HOUR_OF_DAY) <= 18)
 					{
 						if(calendar.get(Calendar.MONTH) >= 5 && calendar.get(Calendar.MONTH) <= 10)
 							currentPower = 160*averagePower*24/1140;
@@ -119,7 +119,7 @@ public class User extends Thread
 				case FAMILY:
 					// 模拟家庭用电情况，晚上出现晚高峰
 					// 夜晚只在夏季有额外消耗
-					if(calendar.get(Calendar.HOUR) >= 18 && calendar.get(Calendar.HOUR) <= 23)
+					if(calendar.get(Calendar.HOUR_OF_DAY) >= 18 && calendar.get(Calendar.HOUR_OF_DAY) <= 23)
 					{
 						currentPower = 10*averagePower*24/78;
 					}
@@ -129,7 +129,7 @@ public class User extends Thread
 					}
 					if(calendar.get(Calendar.MONTH) >= 5 && calendar.get(Calendar.MONTH) <= 10)
 					{
-						if(calendar.get(Calendar.HOUR) >= 18 || calendar.get(Calendar.HOUR) <= 8)
+						if(calendar.get(Calendar.HOUR_OF_DAY) >= 18 || calendar.get(Calendar.HOUR_OF_DAY) <= 8)
 							currentPower += 5*averagePower*24/78;
 					}
 					break;
@@ -137,7 +137,7 @@ public class User extends Thread
 				case FACTORY:
 					// 模拟生产型工厂的用电情况
 					// 在工作时间有高负荷
-					if(calendar.get(Calendar.HOUR) >= 8 && calendar.get(Calendar.HOUR) <= 18)
+					if(calendar.get(Calendar.HOUR_OF_DAY) >= 8 && calendar.get(Calendar.HOUR_OF_DAY) <= 18)
 					{
 						if(calendar.get(Calendar.MONTH) >= 5 && calendar.get(Calendar.MONTH) <= 10)
 							currentPower = 750*averagePower*24/7140;
