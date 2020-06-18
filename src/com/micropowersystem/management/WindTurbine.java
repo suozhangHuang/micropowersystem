@@ -19,7 +19,8 @@ public class WindTurbine extends Thread implements Generator
 		curtailingSpeed = Double.parseDouble(properties.getProperty("curtailingSpeed"));
 
 		bladeRadius = Double.parseDouble(properties.getProperty("bladeRadius"));
-
+		
+		this.start();
 	}
 
 	@Override

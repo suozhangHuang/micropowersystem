@@ -22,6 +22,8 @@ public class SolarPanel extends Thread implements Generator{
 
 		beta = Double.parseDouble(properties.getProperty("beta"));
 		
+		this.start();
+		
 	}
 	
 	@Override
