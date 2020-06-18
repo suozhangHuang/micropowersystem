@@ -17,9 +17,6 @@ public class Weather extends Thread
 		this.Radiancy = Radiancy;
 		this.visibility = visibility;
 		this.windSpeed = windSpeed;
-		
-		// 启动自动更新线程
-		this.start();
 	}
 	
 	public Weather()
@@ -232,9 +229,9 @@ public class Weather extends Thread
 	
 	
 	// 仿真中的刷新实际间隔时间(ms)
-	private final long REFRESH_INTERVAL = 1000;
+	private final long REFRESH_INTERVAL = SimulationSetting.REFRESH_INTERVAL;
 	// 仿真时间与实际时间的比值
 	// 仿真中每经过1000ms，对应系统运行5min
-	private final long TIME_SCALE = 300;
+	private final long TIME_SCALE = SimulationSetting.TIME_SCALE;
 	
 }

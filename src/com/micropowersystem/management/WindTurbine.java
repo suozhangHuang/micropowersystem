@@ -19,8 +19,7 @@ public class WindTurbine extends Thread implements Generator
 		curtailingSpeed = Double.parseDouble(properties.getProperty("curtailingSpeed"));
 
 		bladeRadius = Double.parseDouble(properties.getProperty("bladeRadius"));
-		
-		this.start();
+
 	}
 
 	@Override
@@ -140,8 +139,9 @@ public class WindTurbine extends Thread implements Generator
 			// 计算休眠时间，并更新当前时刻的电价
 			timeDelta = (System.currentTimeMillis() - timestampStart) * TIME_SCALE - timestamp;
 			timestamp = (System.currentTimeMillis() - timestampStart) * TIME_SCALE;
-
-			this.energyMeter += getPower(weather.getWindSpeed()) * timeDelta;
+			
+			if(weather!=null)
+				this.energyMeter += getPower(weather.getWindSpeed()) * timeDelta;
 
 			try
 			{
@@ -171,8 +171,8 @@ public class WindTurbine extends Thread implements Generator
 	private long timestamp;
 
 	// 仿真中的刷新实际间隔时间(ms)
-	private final long REFRESH_INTERVAL = 1000;
+	private final long REFRESH_INTERVAL = SimulationSetting.REFRESH_INTERVAL;
 	// 仿真时间与实际时间的比值
 	// 仿真中每经过1000ms，对应系统运行5min
-	private final long TIME_SCALE = 300;
+	private final long TIME_SCALE = SimulationSetting.TIME_SCALE;
 }

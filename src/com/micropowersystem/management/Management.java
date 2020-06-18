@@ -29,6 +29,6 @@ public interface Management {
 	public HashMap<String,TimeSeries> getForecastPower();
 	public HashMap<String,TimeSeries> getStorageEnergy();
 	
-	public void sendEmail();
+	public void sendEmail(String receiveMailAccount);
 	
 }

@@ -22,8 +22,6 @@ public class SolarPanel extends Thread implements Generator{
 
 		beta = Double.parseDouble(properties.getProperty("beta"));
 		
-		this.start();
-		
 	}
 	
 	@Override
@@ -124,7 +122,7 @@ public class SolarPanel extends Thread implements Generator{
 	{
 		
 		double eta = nominalEfficiency*(1-beta*(temparature-25));
-		return eta*panelArea*getSurfaceRadiancy(radiancy,cloudness);
+		return eta*panelArea*getSurfaceRadiancy(radiancy,cloudness) /1000;
 	}
 	private double getSurfaceRadiancy(double radiancy,double cloudness) {
 		if(cloudness>=0&&cloudness<0.25)
@@ -149,7 +147,8 @@ public class SolarPanel extends Thread implements Generator{
 			timeDelta = (currentTime - timestampStart)*TIME_SCALE - timestamp;
 			timestamp = (currentTime - timestampStart)*TIME_SCALE;
 
-			this.energyMeter += getPower(weather.getTemperature(),weather.getRadiancy(),weather.getCloudness()) * timeDelta/1000;
+			if(weather != null)
+				this.energyMeter += getPower(weather.getTemperature(),weather.getRadiancy(),weather.getCloudness()) * timeDelta/1000;
 			
 			try
 			{
@@ -177,9 +176,9 @@ public class SolarPanel extends Thread implements Generator{
 	private long timestamp;
 
 	// 仿真中的刷新实际间隔时间(ms)
-	private final long REFRESH_INTERVAL = 1000;
+	private final long REFRESH_INTERVAL = SimulationSetting.REFRESH_INTERVAL;
 	// 仿真时间与实际时间的比值
 	// 仿真中每经过1000ms，对应系统运行5min
-	private final long TIME_SCALE = 300;
+	private final long TIME_SCALE = SimulationSetting.TIME_SCALE;
 
 }

@@ -18,8 +18,6 @@ public class Storage extends Thread
 		maxOutputPower= Double.parseDouble(properties.getProperty("maxOutputPower"));
 		
 		timestamp = 0;
-		
-		this.start();
 	}
 	
 	public String getInfo()
@@ -69,11 +67,6 @@ public class Storage extends Thread
 				this.inputPower = -maxOutputPower;
 			else
 				this.inputPower = inputPower;
-		}
-		if(!started)
-		{
-			started = true;
-			this.start();
 		}
 	}
 	
@@ -130,12 +123,9 @@ public class Storage extends Thread
 	private double inputPower;
 	private long timestamp;
 	
-	// 标记仿真是否开始
-	private boolean started = false;
-	
 	// 仿真中的刷新实际间隔时间(ms)
-	private final long REFRESH_INTERVAL = 1000;
+	private final long REFRESH_INTERVAL = SimulationSetting.REFRESH_INTERVAL;
 	// 仿真时间与实际时间的比值
 	// 仿真中每经过1000ms，对应系统运行5min
-	private final long TIME_SCALE = 300;
+	private final long TIME_SCALE = SimulationSetting.TIME_SCALE;
 }
