@@ -223,8 +223,20 @@ public class Manager extends Thread implements Management
 	{
 		try
 		{
-			this.email.setReceiverAccount(receiveMailAccount);
-			this.email.sendEmail("电网提示信息TITLE", "电网提示信息BODY");
+			this.email.setReceiverAccount(receiveMailAccount); 
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String dateString = null;
+			synchronized(this)
+			{
+				dateString = formatter.format(timestamp);
+			}
+			String title = String.format("微电网系统信息 %s", dateString);
+			
+			String body = String.format("来自微电网系统的信息:\n    尊敬的用户您好，您已经卖电%.2f度，收益%.2f元。", 
+					accumulatedOutputEnergy/3600 - accumulatedInputEnergy/3600,
+					accumulatedIncome-accumulatedCost);
+			
+			this.email.sendEmail(title, body);
 		} catch (Exception e)
 		{
 			// TODO Auto-generated catch block
@@ -250,7 +262,7 @@ public class Manager extends Thread implements Management
 			RegularTimePeriod regularTimePeriod = new FixedMillisecond(timestamp);
 
 			/************************模拟停电*************************/
-			if(calendar.get(Calendar.DAY_OF_YEAR)==2)
+			if(calendar.get(Calendar.DAY_OF_YEAR)==3)
 			{
 				this.powerSystem.setCondition(false);
 			}
@@ -328,6 +340,8 @@ public class Manager extends Thread implements Management
 					accumulatedOutputEnergy += -totalEnergyPowerSystem;
 					accumulatedIncome += -totalEnergyPowerSystem * powerSystem.getSellingPrice();
 				}
+				
+				// 向dataHandler发送当前的资金信息
 				if(this.dataHandler != null)
 				{
 					ArrayList<Double> prices = new ArrayList<Double>();
