@@ -248,15 +248,6 @@ public class Manager extends Thread implements Management
 			calendar.setTime(new Date(timestamp));
 			RegularTimePeriod regularTimePeriod = new FixedMillisecond(timestamp);
 			
-			System.out.printf("weather:%.3f %.3f %.3f %.3f %.3f %.3f %.3f ", 
-					weather.getCloudness(),
-					weather.getHumidity(),
-					weather.getPressure(), 
-					weather.getRadiancy(),
-					weather.getTemperature(),
-					weather.getVisibility(),
-					weather.getWindSpeed());
-			
 			// 计算休眠时间内的电能变化
 			// 发电机的电能用输出来表示
 			double totalEnergyGenerator = 0;
@@ -270,9 +261,7 @@ public class Manager extends Thread implements Management
 				generatorPower.get(name).add(regularTimePeriod, generators.get(name).getPower(Generator.REALTIME));
 				totalPowerGenerator += generators.get(name).getPower(Generator.REALTIME);
 				totalEnergyGenerator += generated;
-				System.out.printf("%s:%f ", name, generators.get(name).getPower(Generator.REALTIME));
 			}
-			System.out.printf("\n");
 			totalPower.get(GENERATOR).add(regularTimePeriod, totalPowerGenerator);
 			
 			// 用户的电能用输入来表示
