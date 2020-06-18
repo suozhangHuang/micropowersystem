@@ -60,6 +60,11 @@ public class User extends Thread
 		}
 	}
 	
+	public void setBlackedOut(boolean blackedOut)
+	{
+		this.blackedOut = blackedOut;
+	}
+	
 	public double getWattHour()
 	{
 		return currentEnergy;
@@ -67,7 +72,7 @@ public class User extends Thread
 	
 	public double getPower()
 	{
-		return currentPower;
+		return blackedOut ? 0 :currentPower;
 	}
 	
 	public void userStart()
@@ -92,71 +97,114 @@ public class User extends Thread
 			// 根据用户类型和时间戳更新用户用电功率
 			synchronized(this)
 			{
-				// 实现用户用电量信息更新
-				Calendar calendar = Calendar.getInstance();
-				calendar.setTime(new Date(timestamp));
-				
-				// 单位均为kW
-				switch(this.type)
+				if(!blackedOut)
 				{
-				case OFFICE:
-					// 模拟办公场所的用电情况，工作时间均匀用电
-					// 取50W/m^2, 2000m^2
-					// 夏季时80W/m^2 
-					if(calendar.get(Calendar.HOUR_OF_DAY) >= 8 && calendar.get(Calendar.HOUR_OF_DAY) <= 18)
+					// 实现用户用电量信息更新
+					Calendar calendar = Calendar.getInstance();
+					calendar.setTime(new Date(timestamp));
+					
+					double hour = calendar.get(Calendar.HOUR_OF_DAY) +  calendar.get(Calendar.MINUTE)/60.0; 
+					int month = calendar.get(Calendar.MONTH);
+					
+					// 单位均为kW
+					switch(this.type)
 					{
-						if(calendar.get(Calendar.MONTH) >= 5 && calendar.get(Calendar.MONTH) <= 10)
-							currentPower = 160*averagePower*24/1140;
+					case OFFICE:
+						// 模拟办公场所的用电情况，工作时间均匀用电
+						// 取50W/m^2, 2000m^2
+						// 夏季时80W/m^2 
+						if(hour >= 8 && hour <= 18)
+						{
+							if(month >= 5 && month <= 10)
+								currentPower = 160*averagePower*24/1140;
+							else
+								currentPower = 100*averagePower*24/1140;
+							currentPower += valleyCurve(50*averagePower*24/1140, (hour-8)/10);
+						}
+						else if( hour>=7 && hour<=8)
+						{
+							if(month >= 5 && month <= 10)
+								currentPower = continuousInterp(10*averagePower*24/1140, 160*averagePower*24/1140, hour-7);
+							else
+								currentPower = continuousInterp(10*averagePower*24/1140, 100*averagePower*24/1140, hour-7);
+						}
+						else if( hour>=18 && hour<=20)
+						{
+							if(month >= 5 && month <= 10)
+								currentPower = continuousInterp(160*averagePower*24/1140, 10*averagePower*24/1140, (hour-18)/2);
+							else
+								currentPower = continuousInterp(100*averagePower*24/1140, 10*averagePower*24/1140, (hour-18)/2);
+						}
+						else{
+							currentPower = 10*averagePower*24/1140;
+						}
+						break;
+						
+					case FAMILY:
+						// 模拟家庭用电情况，晚上出现晚高峰
+						// 夜晚只在夏季有额外消耗
+						if(hour >= 18 && hour <= 23)
+						{
+							currentPower = 10*averagePower*24/78;
+						}
+						else if( hour>=23)
+						{
+							currentPower = continuousInterp(10*averagePower*24/78, 1*averagePower*24/78, hour-23);
+						}
+						else if( hour<=18 && hour>=16)
+						{
+							currentPower = continuousInterp(1*averagePower*24/78, 10*averagePower*24/78, (hour-16)/2);
+						}
 						else
-							currentPower = 100*averagePower*24/1140;
-					}
-					else
-					{
-						currentPower = 10*averagePower*24/1140;
-					}
-					break;
-					
-				case FAMILY:
-					// 模拟家庭用电情况，晚上出现晚高峰
-					// 夜晚只在夏季有额外消耗
-					if(calendar.get(Calendar.HOUR_OF_DAY) >= 18 && calendar.get(Calendar.HOUR_OF_DAY) <= 23)
-					{
-						currentPower = 10*averagePower*24/78;
-					}
-					else
-					{
-						currentPower = 1*averagePower*24/78;
-					}
-					if(calendar.get(Calendar.MONTH) >= 5 && calendar.get(Calendar.MONTH) <= 10)
-					{
-						if(calendar.get(Calendar.HOUR_OF_DAY) >= 18 || calendar.get(Calendar.HOUR_OF_DAY) <= 8)
-							currentPower += 5*averagePower*24/78;
-					}
-					break;
-					
-				case FACTORY:
-					// 模拟生产型工厂的用电情况
-					// 在工作时间有高负荷
-					if(calendar.get(Calendar.HOUR_OF_DAY) >= 8 && calendar.get(Calendar.HOUR_OF_DAY) <= 18)
-					{
-						if(calendar.get(Calendar.MONTH) >= 5 && calendar.get(Calendar.MONTH) <= 10)
-							currentPower = 750*averagePower*24/7140;
+						{
+							currentPower = 1*averagePower*24/78;
+						}
+						if(month >= 5 && month <= 10)
+						{
+							if(hour >= 18 || hour <= 8)
+								currentPower += 5*averagePower*24/78;
+						}
+						break;
+						
+					case FACTORY:
+						// 模拟生产型工厂的用电情况
+						// 在工作时间有高负荷
+						if(hour >= 8 && hour <= 21)
+						{
+							if(month >= 5 && month <= 10)
+								currentPower = 750*averagePower*24/10000;
+							else
+								currentPower = 700*averagePower*24/10000;
+							currentPower += valleyCurve(200*averagePower*24/10000, (hour-8)/10);
+						}
+						else if( hour>=7 && hour<=8)
+						{
+							if(month >= 5 && month <= 10)
+								currentPower = continuousInterp(10*averagePower*24/10000, 750*averagePower*24/10000, hour-7);
+							else
+								currentPower = continuousInterp(10*averagePower*24/10000, 700*averagePower*24/10000, hour-7);
+						}
+						else if( hour>=21 && hour<=22)
+						{
+							if(month >= 5 && month <= 10)
+								currentPower = continuousInterp(750*averagePower*24/10000, 10*averagePower*24/10000, hour-21);
+							else
+								currentPower = continuousInterp(700*averagePower*24/10000, 10*averagePower*24/10000, hour-21);
+						}
 						else
-							currentPower = 700*averagePower*24/7140;
+						{
+							currentPower = 10*averagePower*24/10000;
+						}
+						break;
+						
+					case DEFAULT:
+						// 备用
+						currentPower = 0;
+						break;
 					}
-					else
-					{
-						currentPower = 10*averagePower*24/7140;
-					}
-					break;
 					
-				case DEFAULT:
-					// 备用
-					currentPower = 0;
-					break;
+					currentEnergy += currentPower * timeDelta/1000;
 				}
-				
-				currentEnergy += currentPower * timeDelta/1000;
 			}
 			
 			try
@@ -167,6 +215,16 @@ public class User extends Thread
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	private double continuousInterp(double begin, double end, double t)
+	{
+		return (0.5*Math.sin(Math.PI*(t-0.5))+0.5)*(end-begin)+begin;
+	}
+	
+	private double valleyCurve(double depth, double t)
+	{
+		return -Math.exp(-108*(t-0.5)*(t-0.5))*depth;
 	}
 
 	// 仿真中的系统时间，从1970年1月1日 0:00 开始计算经过的ms数
@@ -186,6 +244,8 @@ public class User extends Thread
 	private double currentPower = 0;
 	// 用户当前电表读数
 	private double currentEnergy = 0;
+	// 当前是否被停电
+	private boolean blackedOut = false;
 	
 	// 标志自动更新是否开始
 	private boolean started = false;

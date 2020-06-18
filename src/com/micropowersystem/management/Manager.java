@@ -94,6 +94,7 @@ public class Manager extends Thread implements Management
 		
 		maxStorageInputPower += storage.getMaxInputPower();
 		maxStorageOutputPower += storage.getMaxOutputPower();
+		maxStorageEnergy += storage.getCapacity();
 	}
 	
 	public void setDataHandler(DataHandler dataHandler)
@@ -247,6 +248,17 @@ public class Manager extends Thread implements Management
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(new Date(timestamp));
 			RegularTimePeriod regularTimePeriod = new FixedMillisecond(timestamp);
+
+			/************************模拟停电*************************/
+			if(calendar.get(Calendar.DAY_OF_YEAR)==2)
+			{
+				this.powerSystem.setCondition(false);
+			}
+			else
+			{
+				this.powerSystem.setCondition(true);
+			}
+			/************************模拟停电*************************/
 			
 			// 计算休眠时间内的电能变化
 			// 发电机的电能用输出来表示
@@ -282,6 +294,7 @@ public class Manager extends Thread implements Management
 			// 储能装置的电能用输入来表示
 			double totalEnergyStorage = 0;
 			double totalPowerStorage = 0;
+			currentStorageEnergy = 0;
 			for(String name:storages.keySet())
 			{
 				double input = storages.get(name).getCurrentEnergy() - energyMeters.get(name);
@@ -292,32 +305,47 @@ public class Manager extends Thread implements Management
 				storagePower.get(name).add(regularTimePeriod, storages.get(name).getInputPower());
 				totalPowerStorage += storages.get(name).getInputPower();
 				totalEnergyStorage += input;
+				currentStorageEnergy += storages.get(name).getCurrentEnergy();
 			}
 			totalPower.get(STORAGE).add(regularTimePeriod, totalPowerStorage);
 			
 			// 计算从电网输入的能量，并计算对应的电费
-			double totalEnergyPowerSystem = totalEnergyStorage + totalEnergyUser - totalEnergyGenerator;
-			double totalPowerPowerSystem = totalPowerStorage + totalPowerUser - totalPowerGenerator;
-			powerSystemVoltage.get("PowerSystem").add(regularTimePeriod, 220);
-			powerSystemPower.get("PowerSystem").add(regularTimePeriod, totalPowerPowerSystem);
-			if(totalEnergyPowerSystem>0)
+			double totalEnergyPowerSystem;
+			double totalPowerPowerSystem;
+			if(powerSystem.getCondition())
 			{
-				accumulatedInputEnergy += totalEnergyPowerSystem;
-				accumulatedCost += totalEnergyPowerSystem * powerSystem.getBuyingPrice();
+				totalEnergyPowerSystem = totalEnergyStorage + totalEnergyUser - totalEnergyGenerator;
+				totalPowerPowerSystem = totalPowerStorage + totalPowerUser - totalPowerGenerator;
+				powerSystemVoltage.get("PowerSystem").add(regularTimePeriod, 220);
+				powerSystemPower.get("PowerSystem").add(regularTimePeriod, totalPowerPowerSystem);
+				if(totalEnergyPowerSystem>0)
+				{
+					accumulatedInputEnergy += totalEnergyPowerSystem;
+					accumulatedCost += totalEnergyPowerSystem * powerSystem.getBuyingPrice();
+				}
+				else
+				{
+					accumulatedOutputEnergy += -totalEnergyPowerSystem;
+					accumulatedIncome += -totalEnergyPowerSystem * powerSystem.getSellingPrice();
+				}
+				if(this.dataHandler != null)
+				{
+					ArrayList<Double> prices = new ArrayList<Double>();
+					prices.add(accumulatedIncome);
+					prices.add(accumulatedCost);
+					prices.add(accumulatedOutputEnergy/3600);
+					prices.add(accumulatedInputEnergy/3600);
+					dataHandler.OnDataChanged(prices);
+				}
+				totalPower.get(POWERSYSTEM).add(regularTimePeriod, totalPowerPowerSystem);
 			}
 			else
 			{
-				accumulatedOutputEnergy += -totalEnergyPowerSystem;
-				accumulatedIncome += -totalEnergyPowerSystem * powerSystem.getSellingPrice();
-			}
-			if(this.dataHandler != null)
-			{
-				ArrayList<Double> prices = new ArrayList<Double>();
-				prices.add(accumulatedIncome);
-				prices.add(accumulatedCost);
-				prices.add(accumulatedOutputEnergy/3600);
-				prices.add(accumulatedInputEnergy/3600);
-				dataHandler.OnDataChanged(prices);
+				totalEnergyPowerSystem = 0;
+				totalPowerPowerSystem = 0;
+				powerSystemVoltage.get("PowerSystem").add(regularTimePeriod, 0);
+				powerSystemPower.get("PowerSystem").add(regularTimePeriod, totalPowerPowerSystem);
+				totalPower.get(POWERSYSTEM).add(regularTimePeriod, totalPowerPowerSystem);
 			}
 			
 			// 统计电价信息
@@ -341,32 +369,74 @@ public class Manager extends Thread implements Management
 			}
 			
 			// 分配下一时间段的储能装置策略
-			// 价格低于平均
-			if(avgSellingPrice > powerSystem.getBuyingPrice()*STOP_CONSUMING_RATIO)
+			// 如果没有停电
+			if(powerSystem.getCondition())
 			{
-				// 如果价格远低于平均，那么就买电
-				if(avgSellingPrice > powerSystem.getBuyingPrice()*BUY_RATIO)
+				for(String name:users.keySet())
 				{
-					setStorageInputPower(maxStorageInputPower);
+					users.get(name).setBlackedOut(false);
 				}
-				// 否则停止储能装置的供能
-				else
+				
+				// 价格低于平均
+				if(avgSellingPrice > powerSystem.getBuyingPrice()*STOP_CONSUMING_RATIO)
 				{
-					setStorageInputPower(0);
+					// 如果价格远低于平均，那么就买电
+					if(avgSellingPrice > powerSystem.getBuyingPrice()*BUY_RATIO)
+					{
+						setStorageInputPower(maxStorageInputPower);
+					}
+					// 否则停止储能装置的供能
+					else
+					{
+						setStorageInputPower(0);
+					}
+				}
+				// 价格高于平均
+				if(avgBuyingPrice < powerSystem.getSellingPrice()*START_CONSUMING_RATIO)
+				{
+					// 如果价格远高于平均，那么就卖电
+					if(avgBuyingPrice < powerSystem.getSellingPrice()*SELL_RATIO)
+					{
+						setStorageInputPower(-maxStorageOutputPower);
+					}
+					// 否则使用储能装置供电
+					else
+					{
+						setStorageInputPower(-totalPowerUser + totalPowerGenerator);
+					}
 				}
 			}
-			// 价格高于平均
-			if(avgBuyingPrice < powerSystem.getSellingPrice()*START_CONSUMING_RATIO)
+			else
 			{
-				// 如果价格远高于平均，那么就卖电
-				if(avgBuyingPrice < powerSystem.getSellingPrice()*SELL_RATIO)
+				// 发生停电问题，则所有能量由储能装置提供
+				setStorageInputPower(-totalPowerUser + totalPowerGenerator);
+				
+				// 如果储能值低于30%则暂停工厂的用电
+				// 如果储能值低于30%则暂停办公室供电
+				// 如果储能值低于5%则暂停家庭供电
+				for(String name:users.keySet())
 				{
-					setStorageInputPower(-maxStorageOutputPower);
-				}
-				// 否则使用储能装置供电
-				else
-				{
-					setStorageInputPower(-totalPowerUser + totalPowerGenerator);
+					if(users.get(name).getType() == User.FACTORY)
+					{
+						if(maxStorageEnergy*0.3 > currentStorageEnergy)
+							users.get(name).setBlackedOut(true);
+						else
+							users.get(name).setBlackedOut(false);
+					}
+					else if(users.get(name).getType() == User.OFFICE)
+					{
+						if(maxStorageEnergy*0.3 > currentStorageEnergy)
+							users.get(name).setBlackedOut(true);
+						else
+							users.get(name).setBlackedOut(false);
+					}
+					else if(users.get(name).getType() == User.FAMILY)
+					{
+						if(maxStorageEnergy*0.05 > currentStorageEnergy)
+							users.get(name).setBlackedOut(true);
+						else
+							users.get(name).setBlackedOut(false);
+					}
 				}
 			}
 			
@@ -456,6 +526,8 @@ public class Manager extends Thread implements Management
 	// 统计储能设备的最大功率
 	private double maxStorageInputPower = 0;
 	private double maxStorageOutputPower = 0;
+	private double maxStorageEnergy = 0;
+	private double currentStorageEnergy = 0;
 	
 	// 指定策略时使用的参数 
 	// 当avgSellingPrice > buyingPrice * STOP_CONSUMING_RATIO 时停止使用储能装置的储能

@@ -126,7 +126,7 @@ public class WindTurbine extends Thread implements Generator
 			return powerBase;
 		}
 
-		return powerBase * (windSpeed - minWindSpeed) / (nomialWindSpeed - minWindSpeed);
+		return powerBase * Math.sin((windSpeed - minWindSpeed) / (nomialWindSpeed - minWindSpeed) * Math.PI/2);
 	}
 
 	// 实时数据更新

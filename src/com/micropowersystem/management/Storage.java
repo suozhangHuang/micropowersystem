@@ -33,6 +33,11 @@ public class Storage extends Thread
 		}
 	}
 	
+	public double getCapacity()
+	{
+		return this.capacity;
+	}
+	
 	public void setMaximumPower(double maxInputPower, double maxOutputPower)
 	{
 		this.maxInputPower = maxInputPower;
