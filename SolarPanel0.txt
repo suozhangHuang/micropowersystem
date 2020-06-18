@@ -1,0 +1,8 @@
+#
+#Thu Jun 18 14:52:11 CST 2020
+name=Solar_Panel_1
+powerBase=1500
+voltageBase=220000
+panelArea=1638
+nominalEfficiency=0.158
+beta=0.004
