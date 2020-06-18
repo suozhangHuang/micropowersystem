@@ -3,18 +3,13 @@ package com.micropowersystem.management;
 import java.io.IOException;
 import java.util.Vector;
 
-
-
 public class MainSimulation {
 	public static void main(String[] args) throws InterruptedException, IOException
 	{
-		
-		
-		
+	
 		Weather w0 = new Weather();
 		WeatherForecast wf0 = new WeatherForecast();
 		wf0.setWeather(w0);
-		
 		
 		Generator g0 = new SolarPanel("solar_panel_1.properties");
 		Generator g1 = new WindTurbine("wind_turbine_1.properties");
@@ -69,6 +64,18 @@ public class MainSimulation {
 		
 		frame.setManager(m);
 		
+		w0.start();
+		ps.start();
+		((Thread)g0).start();
+		((Thread)g1).start();
+		((Thread)g2).start();
+		for(User user:uVec)
+		{
+			user.start();
+		}
+		s0.start();
+		s1.start();
+
 		frame.startFrame();
 		m.start();
 		

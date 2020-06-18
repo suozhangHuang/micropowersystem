@@ -18,6 +18,11 @@ public class User extends Thread
 		}
 	}
 	
+	public int getType()
+	{
+		return this.type;
+	}
+	
 	public String getInfo()
 	{
 		String info = "";
@@ -101,13 +106,13 @@ public class User extends Thread
 					if(calendar.get(Calendar.HOUR) >= 8 && calendar.get(Calendar.HOUR) <= 18)
 					{
 						if(calendar.get(Calendar.MONTH) >= 5 && calendar.get(Calendar.MONTH) <= 10)
-							currentPower = 160*averagePower/1140;
+							currentPower = 160*averagePower*24/1140;
 						else
-							currentPower = 100*averagePower/1140;
+							currentPower = 100*averagePower*24/1140;
 					}
 					else
 					{
-						currentPower = 10*averagePower/1140;
+						currentPower = 10*averagePower*24/1140;
 					}
 					break;
 					
@@ -116,16 +121,16 @@ public class User extends Thread
 					// 夜晚只在夏季有额外消耗
 					if(calendar.get(Calendar.HOUR) >= 18 && calendar.get(Calendar.HOUR) <= 23)
 					{
-						currentPower = 10*averagePower/78;
+						currentPower = 10*averagePower*24/78;
 					}
 					else
 					{
-						currentPower = 1*averagePower/78;
+						currentPower = 1*averagePower*24/78;
 					}
 					if(calendar.get(Calendar.MONTH) >= 5 && calendar.get(Calendar.MONTH) <= 10)
 					{
 						if(calendar.get(Calendar.HOUR) >= 18 || calendar.get(Calendar.HOUR) <= 8)
-							currentPower += 5*averagePower/78;
+							currentPower += 5*averagePower*24/78;
 					}
 					break;
 					
@@ -135,13 +140,13 @@ public class User extends Thread
 					if(calendar.get(Calendar.HOUR) >= 8 && calendar.get(Calendar.HOUR) <= 18)
 					{
 						if(calendar.get(Calendar.MONTH) >= 5 && calendar.get(Calendar.MONTH) <= 10)
-							currentPower = 750*averagePower/7140;
+							currentPower = 750*averagePower*24/7140;
 						else
-							currentPower = 700*averagePower/7140;
+							currentPower = 700*averagePower*24/7140;
 					}
 					else
 					{
-						currentPower = 10*averagePower/7140;
+						currentPower = 10*averagePower*24/7140;
 					}
 					break;
 					
@@ -186,9 +191,9 @@ public class User extends Thread
 	private boolean started = false;
 
 	// 仿真中的刷新实际间隔时间(ms)
-	private final long REFRESH_INTERVAL = 1000;
+	private final long REFRESH_INTERVAL = SimulationSetting.REFRESH_INTERVAL;
 	// 仿真时间与实际时间的比值
 	// 仿真中每经过1000ms，对应系统运行5min
-	private final long TIME_SCALE = 300;
+	private final long TIME_SCALE = SimulationSetting.TIME_SCALE;
 	
 }

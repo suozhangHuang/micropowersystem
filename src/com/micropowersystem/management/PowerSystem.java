@@ -9,7 +9,6 @@ public class PowerSystem extends Thread
 	{
 		this.price = 0;
 		this.providePower = true;
-		this.start();
 	}
 	
 	public String getInfo()
@@ -53,7 +52,8 @@ public class PowerSystem extends Thread
 			// TODO 根据当前的时间戳更新电价信息
 			synchronized(this)
 			{
-				price = 1;
+				// 基准电价0.5/kWh = 1.389e-4/kJ
+				price = 1.389e-4;
 				
 				Calendar calendar = Calendar.getInstance();
 				calendar.setTime(new Date(timestamp));
@@ -82,10 +82,10 @@ public class PowerSystem extends Thread
 	private boolean providePower;
 
 	// 仿真中的刷新实际间隔时间(ms)
-	private final long REFRESH_INTERVAL = 1000;
+	private final long REFRESH_INTERVAL = SimulationSetting.REFRESH_INTERVAL;
 	// 仿真时间与实际时间的比值
 	// 仿真中每经过1000ms，对应系统运行5min
-	private final long TIME_SCALE = 300;
+	private final long TIME_SCALE = SimulationSetting.TIME_SCALE;
 	
 	
 }

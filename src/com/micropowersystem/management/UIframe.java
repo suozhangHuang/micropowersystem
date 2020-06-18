@@ -126,13 +126,13 @@ public class UIframe extends JFrame implements DataHandler{
 	private Vector<TimeSeries> tsVecP5 = new Vector<TimeSeries>();
 	
 	//Data
-	private Vector<HashMap<String,TimeSeries>> powerTS = null;
-	private Vector<HashMap<String,TimeSeries>> voltageTS = null;
+	private Vector<HashMap<String,TimeSeries>> powerTS = new  Vector<HashMap<String,TimeSeries>>();
+	private Vector<HashMap<String,TimeSeries>> voltageTS = new  Vector<HashMap<String,TimeSeries>>();
 	private TimeSeries sellingPriceTS = null;
 	private TimeSeries buyingPriceTS = null;
-	private Vector<TimeSeries> TotalPowerTS = null;
-	private Vector<Vector<String>> namesVec = null;
-	private Vector<HashMap<String,String>> infoVec = null;
+	private Vector<TimeSeries> TotalPowerTS = new Vector<TimeSeries>();
+	private Vector<Vector<String>> namesVec = new Vector<Vector<String>>();
+	private Vector<HashMap<String,String>> infoVec = new Vector<HashMap<String,String>>();
 	private HashMap<String,TimeSeries> forecastPowerTS = null;
 	private HashMap<String,TimeSeries> storageEnergyTS = null;
 	
@@ -459,7 +459,7 @@ public class UIframe extends JFrame implements DataHandler{
 		emailMenuItem.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
-				management.sendEmail();
+				management.sendEmail("huangjl17@mails.tsinghua.edu.cn");
 			}
 			
 		});

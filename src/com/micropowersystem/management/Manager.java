@@ -59,7 +59,22 @@ public class Manager extends Thread implements Management
 	
 	public void addUser(User user)
 	{
-		String name = String.format("User%d", users.size());
+		String name = null;
+		switch(user.getType())
+		{
+		case User.OFFICE:
+			name = String.format("Office%d", users.size());
+			break;
+		case User.FAMILY:
+			name = String.format("Family%d", users.size());
+			break;
+		case User.FACTORY:
+			name = String.format("Factory%d", users.size());
+			break;
+		default:
+			name = String.format("User%d", users.size());
+			break;
+		}
 		users.put(name, user);
 		userPower.put(name, new TimeSeries(name));
 		userVoltage.put(name, new TimeSeries(name));
@@ -193,7 +208,7 @@ public class Manager extends Thread implements Management
 	@Override
 	public HashMap<String, TimeSeries> getForecastPower()
 	{
-		return null;
+		return new HashMap<String, TimeSeries>();
 	}
 	
 	@Override
@@ -203,10 +218,11 @@ public class Manager extends Thread implements Management
 	}
 
 	@Override
-	public void sendEmail()
+	public void sendEmail(String receiveMailAccount)
 	{
 		try
 		{
+			this.email.setReceiverAccount(receiveMailAccount);
 			this.email.sendEmail("电网提示信息TITLE", "电网提示信息BODY");
 		} catch (Exception e)
 		{
@@ -281,43 +297,38 @@ public class Manager extends Thread implements Management
 			// 计算从电网输入的能量，并计算对应的电费
 			double totalEnergyPowerSystem = totalEnergyStorage + totalEnergyUser - totalEnergyGenerator;
 			double totalPowerPowerSystem = totalPowerStorage + totalPowerUser - totalPowerGenerator;
+			powerSystemVoltage.get("PowerSystem").add(new FixedMillisecond(timestamp), 220);
+			powerSystemPower.get("PowerSystem").add(new FixedMillisecond(timestamp), totalPowerPowerSystem);
 			if(totalEnergyPowerSystem>0)
 			{
-				accumulatedIncome -= totalEnergyPowerSystem * powerSystem.getBuyingPrice();
+				accumulatedInputEnergy += totalEnergyPowerSystem;
+				accumulatedCost += totalEnergyPowerSystem * powerSystem.getBuyingPrice();
 			}
 			else
 			{
+				accumulatedOutputEnergy += -totalEnergyPowerSystem;
 				accumulatedIncome += -totalEnergyPowerSystem * powerSystem.getSellingPrice();
 			}
 			if(this.dataHandler != null)
 			{
 				ArrayList<Double> prices = new ArrayList<Double>();
-				if(totalEnergyPowerSystem>0)
-				{
-					prices.add(0.0);
-					prices.add(totalEnergyPowerSystem * powerSystem.getBuyingPrice());
-					prices.add(powerSystem.getSellingPrice());
-					prices.add(powerSystem.getBuyingPrice());
-				}
-				else
-				{
-					prices.add(-totalEnergyPowerSystem * powerSystem.getBuyingPrice());
-					prices.add(0.0);
-					prices.add(powerSystem.getSellingPrice());
-					prices.add(powerSystem.getBuyingPrice());
-				}
+				prices.add(accumulatedIncome);
+				prices.add(accumulatedCost);
+				prices.add(accumulatedOutputEnergy);
+				prices.add(accumulatedInputEnergy);
 				dataHandler.OnDataChanged(prices);
 			}
 			
 			// 统计电价信息
-			sellingPrice.add(new FixedMillisecond(timestamp), powerSystem.getBuyingPrice());
-			buyingPrice.add(new FixedMillisecond(timestamp), powerSystem.getSellingPrice());
+			buyingPrice.add(new FixedMillisecond(timestamp), powerSystem.getBuyingPrice());
+			sellingPrice.add(new FixedMillisecond(timestamp), powerSystem.getSellingPrice());
 			
 			if(pointCount < maxPointCount)
 			{
 				avgBuyingPrice = (avgBuyingPrice * pointCount + powerSystem.getBuyingPrice())/(pointCount + 1);
 				avgSellingPrice = (avgSellingPrice * pointCount + powerSystem.getSellingPrice())/(pointCount + 1);
-				pointCount += 1;
+				buyingPriceList.addFirst(powerSystem.getBuyingPrice());
+				sellingPriceList.addFirst(powerSystem.getSellingPrice());
 			}
 			else
 			{
@@ -329,6 +340,11 @@ public class Manager extends Thread implements Management
 			
 			// 分配下一时间段的储能装置策略
 			// 价格低于平均
+			System.out.printf("avgSP:%f avgBP:%f SP:%f BP:%f\n", 
+					avgSellingPrice, 
+					avgBuyingPrice, 
+					powerSystem.getSellingPrice(), 
+					powerSystem.getBuyingPrice());
 			if(avgSellingPrice > powerSystem.getBuyingPrice()*STOP_CONSUMING_RATIO)
 			{
 				// 如果价格远低于平均，那么就买电
@@ -469,16 +485,19 @@ public class Manager extends Thread implements Management
 	// 仿真中的系统时间，从1970年1月1日 0:00 开始计算经过的ms数
 	private long timestamp = 0;
 	// 仿真中的刷新实际间隔时间(ms)
-	private final long REFRESH_INTERVAL = 3000;
+	private final long REFRESH_INTERVAL = SimulationSetting.REFRESH_INTERVAL*3;
 	// 仿真时间与实际时间的比值
 	// 仿真中每经过1000ms，对应系统运行5min
-	private final long TIME_SCALE = 300;
+	private final long TIME_SCALE = SimulationSetting.TIME_SCALE;
 	
 	// 与累计收入相关的信息
-	DataHandler dataHandler = null;
-	double accumulatedIncome = 0;
+	private DataHandler dataHandler = null;
+	private double accumulatedIncome = 0;
+	private double accumulatedCost = 0;
+	private double accumulatedInputEnergy = 0;
+	private double accumulatedOutputEnergy = 0;
 	
 	// 发送邮件的类
-	Email email = new Email();
+	private Email email = new Email();
 
 }

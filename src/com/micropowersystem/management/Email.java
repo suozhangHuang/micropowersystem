@@ -20,6 +20,11 @@ public class Email
 		this.myEmailSMTPHost = myEmailSMTPHost;
 		this.receiveMailAccount = receiveMailAccount;
 	}
+
+	public void setReceiverAccount(String receiveMailAccount)
+	{
+		this.receiveMailAccount = receiveMailAccount;
+	}
 	
 	public void sendEmail(String title, String body) throws Exception
 	{
