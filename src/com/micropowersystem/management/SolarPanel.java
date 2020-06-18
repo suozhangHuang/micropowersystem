@@ -1,17 +1,45 @@
 package com.micropowersystem.management;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 public class SolarPanel extends Thread implements Generator{
 	
-	public SolarPanel(Properties properties) {
+	public SolarPanel(String infoFileName)throws IOException {
+		Properties properties = new Properties();
+
+		properties.load(new FileInputStream(infoFileName));
+		name = properties.getProperty("name");
+
+		voltageBase = Double.parseDouble(properties.getProperty("voltageBase"));
+
+		powerBase = Double.parseDouble(properties.getProperty("powerBase"));
+
+		panelArea = Double.parseDouble(properties.getProperty("panelArea"));
+
+		nominalEfficiency = Double.parseDouble(properties.getProperty("nominalEfficiency"));
+
+		beta = Double.parseDouble(properties.getProperty("beta"));
 		
 	}
 	
 	@Override
 	public String getInfo()
 	{
-		return null;
+		return String.format("name %s\nvoltageBase %f\npowerBase %f\npanelArea %f\nnominalEfficiency %f\nbeta %f\n",
+
+				name,
+
+				voltageBase,
+
+				powerBase,
+
+				panelArea,
+
+				nominalEfficiency,
+
+				beta);
 	}
 
 	@Override
@@ -136,7 +164,8 @@ public class SolarPanel extends Thread implements Generator{
 	private double powerBase;
 	private double panelArea;
 	private double nominalEfficiency;
-	private final double beta = 0.004;
+	private double beta = 0.004;
+	private String name;
 	
 	// µçÕ¾Êý¾Ý
 	private double energyMeter = 0;
