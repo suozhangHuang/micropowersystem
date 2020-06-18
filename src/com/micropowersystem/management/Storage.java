@@ -18,6 +18,8 @@ public class Storage extends Thread
 		maxOutputPower= Double.parseDouble(properties.getProperty("maxOutputPower"));
 		
 		timestamp = 0;
+		
+		this.start();
 	}
 	
 	public String getInfo()
