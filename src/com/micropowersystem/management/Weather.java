@@ -113,22 +113,11 @@ public class Weather extends Thread
 		double timeInHour = calendar.get(Calendar.HOUR_OF_DAY) + calendar.get(Calendar.MINUTE)/60.0;
 		double cloudness = 0;
 		
-		if(timeInHour>=0 && timeInHour<=4)
-			cloudness = 0.9;
-		if(timeInHour>4 && timeInHour<=7)
-			cloudness = 0.95;
-		if(timeInHour>7 && timeInHour<=9)
-			cloudness = 0.9;
-		if(timeInHour>9 && timeInHour<=15)
-			cloudness = 0.85;
-		if(timeInHour>15 && timeInHour<=16)
-			cloudness = 0.7;
-		if(timeInHour>16 && timeInHour<=18)
-			cloudness = 0.95;
-		if(timeInHour>18 && timeInHour<=21)
-			cloudness = 0.9;
-		if(timeInHour>21 && timeInHour<=24)
-			cloudness = 0.8;
+		if(timeInHour>=0 && timeInHour<=15)
+			cloudness = -1*timeInHour*1/15*0.2+0.9;
+		if(timeInHour>15 && timeInHour<=24)
+			cloudness = 1/9*(timeInHour-15)*0.1+0.7;
+		
 		if(TYPE3 == Weather.CLOUDY)
 			return cloudness;
 		else
@@ -163,19 +152,10 @@ public class Weather extends Thread
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date(time));
 		double timeInHour = calendar.get(Calendar.HOUR_OF_DAY) + calendar.get(Calendar.MINUTE)/60.0;
-		double ws = 0;
-		if(timeInHour>=0&&timeInHour<4)
-			ws = 5;
-		if(timeInHour>=4&&timeInHour<8)
-			ws = -0.05*(timeInHour-4)+5;
-		if(timeInHour>=8&&timeInHour<14)
-			ws = (timeInHour-8)/6+4.8;
-		if(timeInHour>=14&&timeInHour<=24)
-			ws = -1*(timeInHour-14)*1.8/10+5.8;
-		if(TYPE2 == Weather.NOTWINDY) {
-			return ws;
+		if(TYPE2 == WINDY) {
+			return 5-0.3468*timeInHour+0.0553*Math.pow(timeInHour,2)-0.0017*Math.pow(timeInHour,3)+10;
 		}else {
-			return ws+10;
+			return 5-0.3468*timeInHour+0.0553*Math.pow(timeInHour,2)-0.0017*Math.pow(timeInHour,3);
 		}
 		
 	}
