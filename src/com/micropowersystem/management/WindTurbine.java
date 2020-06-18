@@ -141,7 +141,7 @@ public class WindTurbine extends Thread implements Generator
 			timestamp = (System.currentTimeMillis() - timestampStart) * TIME_SCALE;
 			
 			if(weather!=null)
-				this.energyMeter += getPower(weather.getWindSpeed()) * timeDelta;
+				this.energyMeter += getPower(weather.getWindSpeed()) * timeDelta/1000;
 
 			try
 			{

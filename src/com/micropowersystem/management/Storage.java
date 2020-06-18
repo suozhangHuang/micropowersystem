@@ -72,6 +72,10 @@ public class Storage extends Thread
 	
 	public double getInputPower()
 	{
+		if(currentEnergy >= capacity || currentEnergy <= 0)
+		{
+			return 0;
+		}
 		return this.inputPower;
 	}
 	

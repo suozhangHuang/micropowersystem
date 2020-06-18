@@ -156,7 +156,7 @@ public class User extends Thread
 					break;
 				}
 				
-				currentEnergy += currentPower * timeDelta;
+				currentEnergy += currentPower * timeDelta/1000;
 			}
 			
 			try

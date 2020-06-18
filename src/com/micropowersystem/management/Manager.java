@@ -218,7 +218,7 @@ public class Manager extends Thread implements Management
 	}
 
 	@Override
-	public void sendEmail(String receiveMailAccount)
+	public boolean sendEmail(String receiveMailAccount)
 	{
 		try
 		{
@@ -229,7 +229,7 @@ public class Manager extends Thread implements Management
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("发送了提醒信息");
+		return true; 
 	}
 	
 	public void run()
@@ -314,8 +314,8 @@ public class Manager extends Thread implements Management
 				ArrayList<Double> prices = new ArrayList<Double>();
 				prices.add(accumulatedIncome);
 				prices.add(accumulatedCost);
-				prices.add(accumulatedOutputEnergy);
-				prices.add(accumulatedInputEnergy);
+				prices.add(accumulatedOutputEnergy/3600);
+				prices.add(accumulatedInputEnergy/3600);
 				dataHandler.OnDataChanged(prices);
 			}
 			
@@ -329,6 +329,7 @@ public class Manager extends Thread implements Management
 				avgSellingPrice = (avgSellingPrice * pointCount + powerSystem.getSellingPrice())/(pointCount + 1);
 				buyingPriceList.addFirst(powerSystem.getBuyingPrice());
 				sellingPriceList.addFirst(powerSystem.getSellingPrice());
+				pointCount++;
 			}
 			else
 			{
@@ -454,7 +455,7 @@ public class Manager extends Thread implements Management
 	private LinkedList<Double> buyingPriceList = new LinkedList<Double>();
 	private LinkedList<Double> sellingPriceList = new LinkedList<Double>();
 	private int pointCount = 0;
-	private final int maxPointCount = 60;
+	private final int maxPointCount = 1000;
 	
 	// 统计储能设备的最大功率
 	private double maxStorageInputPower = 0;
