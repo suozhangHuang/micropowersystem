@@ -168,10 +168,10 @@ public class User extends Thread
 	private long timestamp = 0;
 	
 	// 用户类型
-	public final int OFFICE = 0;
-	public final int FAMILY = 1;
-	public final int FACTORY = 2;
-	public final int DEFAULT = 3;
+	static public final int OFFICE = 0;
+	static public final int FAMILY = 1;
+	static public final int FACTORY = 2;
+	static public final int DEFAULT = 3;
 	private int type = FAMILY;
 	
 	// 用户平均用电量

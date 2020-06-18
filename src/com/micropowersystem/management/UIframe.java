@@ -140,17 +140,21 @@ public class UIframe extends JFrame implements DataHandler{
 	//Management
 	private Management management = null;
 	
-	public static void main(String[] args) {
-        new UIframe("微电网管理系统");
-        
-    }
-		public UIframe(String UIName) {
+	
+	public UIframe() {
+		super("微电网管理系统");
+	}
+	
+	public UIframe(String UIName) {
 		super(UIName);
+	}
+	
+	public void startFrame() {
 		setupComponents();
 		setupActions();
 	}
 	
-	private void setManager(Management management) {
+	public void setManager(Management management) {
 		this.management = management;
 	}
 	
