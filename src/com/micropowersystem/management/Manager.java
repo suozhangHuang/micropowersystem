@@ -218,7 +218,7 @@ public class Manager extends Thread implements Management
 	}
 
 	@Override
-	public void sendEmail(String receiveMailAccount)
+	public boolean sendEmail(String receiveMailAccount)
 	{
 		try
 		{
@@ -230,6 +230,7 @@ public class Manager extends Thread implements Management
 			e.printStackTrace();
 		}
 		System.out.println("发送了提醒信息");
+		return true;
 	}
 	
 	public void run()

@@ -51,6 +51,7 @@ public class UIframe extends JFrame implements DataHandler{
 	
 	private JDialog jDialog;
 	private JDialog jHelpDialog;
+	private JDialog jEmailDialog;
 	
 	
 	//jPanel[0]
@@ -459,7 +460,48 @@ public class UIframe extends JFrame implements DataHandler{
 		emailMenuItem.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
-				management.sendEmail("huangjl17@mails.tsinghua.edu.cn");
+				jEmailDialog = new JDialog();
+				JPanel tempUpPanel = new JPanel();
+				JPanel tempDownPanel = new JPanel();
+				tempUpPanel.setLayout(new GridLayout(1,2));
+				JLabel tempLabel0 = new JLabel();
+				tempLabel0.setText("请输入您想发送的邮箱地址：");
+				JLabel tempLabel1 = new JLabel();
+				JButton tempBut = new JButton("SEND");
+				Box tempBox = Box.createVerticalBox();
+				JTextField tempTF = new JTextField();
+				tempTF.setEditable(true);
+				tempBox.createVerticalStrut(50);
+				tempBox.createHorizontalStrut(100);
+				tempBox.add(tempBut);
+				tempBox.add(tempLabel1);
+				tempUpPanel.add(tempLabel0);
+				tempUpPanel.add(tempTF);
+				tempBut.addActionListener(new ActionListener() {
+
+					public void actionPerformed(ActionEvent arg0) {
+						String tempStr = tempTF.getText();
+						boolean flag = false;
+						if(tempStr!=null) {
+							flag = management.sendEmail(tempStr);
+							if(flag) {
+								tempLabel1.setText("传送成功");
+							}else {
+								tempLabel1.setText("传送失败");
+							}
+						}else {
+							tempLabel1.setText("传送失败或未输入邮箱地址");
+						}
+					}
+					
+				});
+				tempDownPanel.add(tempBox);
+				jEmailDialog.setSize(200,150);
+				jEmailDialog.setLocation(400, 300);
+				jEmailDialog.setLayout(new BorderLayout());
+				jEmailDialog.add(tempUpPanel,BorderLayout.NORTH);
+				jEmailDialog.add(tempDownPanel,BorderLayout.CENTER);
+				jEmailDialog.setVisible(true);
 			}
 			
 		});
