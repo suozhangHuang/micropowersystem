@@ -12,6 +12,11 @@ public class PowerSystem extends Thread
 		this.start();
 	}
 	
+	public String getInfo()
+	{
+		return "µçÍø";
+	}
+	
 	public double getBuyingPrice()
 	{
 		return price;

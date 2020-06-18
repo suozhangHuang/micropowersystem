@@ -22,7 +22,7 @@ public interface Management {
 	public HashMap<String,TimeSeries> getVoltageTimeSeries(int TYPE);
 	public TimeSeries getPrices(int TYPE);
 	
-	//
+	public HashMap<String,TimeSeries> getStorageEnergy();
 	public TimeSeries getTotalPowerTimeSeries(int TYPE);
 	
 	public HashMap<String,String> GetInfo(int TYPE); 

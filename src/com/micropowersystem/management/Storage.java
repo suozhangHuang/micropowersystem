@@ -9,12 +9,33 @@ public class Storage extends Thread
 		this.inputPower = 0;
 	}
 	
+	public String getInfo()
+	{
+		return String.format("电能储存装置\n额定容量 %f\n最大输入功率 %f\n最大输出功率%f", this.capacity, this.maxInputPower, this.maxOutputPower);
+	}
+	
 	public void setCapacity(double capacity)
 	{
 		synchronized(this)
 		{
 			this.capacity = capacity;
 		}
+	}
+	
+	public void setMaximumPower(double maxInputPower, double maxOutputPower)
+	{
+		this.maxInputPower = maxInputPower;
+		this.maxOutputPower = maxOutputPower;
+	}
+	
+	public double getMaxInputPower()
+	{
+		return maxInputPower;
+	}
+	
+	public double getMaxOutputPower()
+	{
+		return maxOutputPower;
 	}
 	
 	public double getCurrentEnergy()
@@ -29,13 +50,23 @@ public class Storage extends Thread
 	{
 		synchronized(this)
 		{
-			this.inputPower = inputPower;
+			if(inputPower > maxInputPower)
+				this.inputPower = maxInputPower;
+			else if(inputPower < -maxOutputPower)
+				this.inputPower = -maxOutputPower;
+			else
+				this.inputPower = inputPower;
 		}
 		if(!started)
 		{
 			started = true;
 			this.start();
 		}
+	}
+	
+	public double getInputPower()
+	{
+		return this.inputPower;
 	}
 	
 	// 模拟真实物理模型的工作，没有实际实现
@@ -77,6 +108,9 @@ public class Storage extends Thread
 			
 		}
 	}
+	
+	private double maxInputPower;
+	private double maxOutputPower;
 	
 	private double capacity;
 	private double currentEnergy;

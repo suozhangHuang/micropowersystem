@@ -18,6 +18,34 @@ public class User extends Thread
 		}
 	}
 	
+	public String getInfo()
+	{
+		String info = "";
+		switch(type)
+		{
+
+		case OFFICE:
+			info = String.format("模拟办公场所的用电情况，工作时间均匀用电\n平均日用电量:%f", this.averagePower);
+			break;
+			
+		case FAMILY:
+			info = String.format("模拟家庭用电情况，晚上出现晚高峰\n夜晚只在夏季有额外消耗\n平均日用电量:%f", this.averagePower);
+			break;
+			
+		case FACTORY:
+			// 模拟生产型工厂的用电情况
+			// 在工作时间有高负荷
+			info = String.format("模拟生产型工厂的用电情况，在工作时间有高负荷\n平均日用电量:%f", this.averagePower);
+			break;
+			
+		case DEFAULT:
+			// 备用
+			info = String.format("备用\n平均日用电量:0");
+			break;
+		}
+		return info;
+	}
+	
 	/* 设置用户平均功率，注意是在非夏季的平均功率 */
 	public void setAveragePower(double averagePower)
 	{
@@ -27,9 +55,14 @@ public class User extends Thread
 		}
 	}
 	
-	public double getCurrentPower()
+	public double getWattHour()
 	{
 		return currentEnergy;
+	}
+	
+	public double getPower()
+	{
+		return currentPower;
 	}
 	
 	public void userStart()
