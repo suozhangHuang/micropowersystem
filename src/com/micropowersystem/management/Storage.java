@@ -1,12 +1,23 @@
 package com.micropowersystem.management;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 public class Storage extends Thread
 {
-	public Storage()
+	public Storage(String infoFileName) throws IOException
 	{
-		this.capacity = 0;
-		this.currentEnergy = 0;
-		this.inputPower = 0;
+		Properties properties = new Properties();
+		properties.load(new FileInputStream(infoFileName));
+
+		capacity = Double.parseDouble(properties.getProperty("capacity"));
+		currentEnergy = 0;
+		inputPower = 0;
+		maxInputPower = Double.parseDouble(properties.getProperty("maxInputPower"));
+		maxOutputPower= Double.parseDouble(properties.getProperty("maxOutputPower"));
+		
+		timestamp = 0;
 	}
 	
 	public String getInfo()
