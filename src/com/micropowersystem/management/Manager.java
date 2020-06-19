@@ -1,6 +1,7 @@
 package com.micropowersystem.management;
 
-import java.sql.Date;
+import java.util.Date;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -20,9 +21,10 @@ public class Manager extends Thread implements Management
 		totalPower.put(POWERSYSTEM, new TimeSeries("POWERSYSTEM"));
 	}
 	
-	public void setWeather(Weather weather)
+	public void setWeatherForecast(WeatherForecast weatherForecast)
 	{
-		this.weather = weather;
+		this.weatherForecast = weatherForecast;
+		this.predictor.setWeatherForecast(weatherForecast);
 	}
 	
 	public void setPowerSystem(PowerSystem powerSystem)
@@ -41,10 +43,12 @@ public class Manager extends Thread implements Management
 		if(generator instanceof WindTurbine)
 		{
 			name = String.format("WindTurbine%d", generators.size());
+			predictor.addWindPowerCapacity(generator.getPower(Generator.NOMIAL));
 		}
 		else if(generator instanceof SolarPanel)
 		{
 			name = String.format("SolarPanel%d", generators.size());
+			predictor.addSolarPanelArea(((SolarPanel)generator).getPanelArea());
 		}
 		else
 		{
@@ -209,7 +213,7 @@ public class Manager extends Thread implements Management
 	@Override
 	public HashMap<String, TimeSeries> getForecastPower()
 	{
-		return new HashMap<String, TimeSeries>();
+		return prediction;
 	}
 	
 	@Override
@@ -246,6 +250,27 @@ public class Manager extends Thread implements Management
 		return true; 
 	}
 	
+	// 停电预警设置
+	// 多次设置时，如果设置的时间是合法的，那么将会直接覆盖
+	public void outageWarning(Date begin, Date end)
+	{
+		Date currentTime = new Date(timestamp);
+		if(currentTime.before(begin) && end.after(begin))
+		{
+			outageExpected = true;
+			this.begin = begin;
+			this.end = end;
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+			System.out.printf("接收到停电预警，预计停电时间为\n%s - %s\n", sdf.format(begin), sdf.format(end));
+		}
+	}
+	
+	public void outageWarningCancel()
+	{
+		outageExpected = false;
+	}
+	
 	public void run()
 	{
 		long timestampStart = System.currentTimeMillis();
@@ -262,6 +287,24 @@ public class Manager extends Thread implements Management
 			RegularTimePeriod regularTimePeriod = new FixedMillisecond(timestamp);
 
 			/************************模拟停电*************************/
+			
+			// 提前12h进行预警
+			if(!this.outageExpected)
+			{
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+				try
+				{
+					if(timestamp > sdf.parse("1970.01.02 12:00:00").getTime() 
+							&& timestamp < sdf.parse("1970.01.02 23:59:59").getTime())
+					{
+						this.outageWarning(sdf.parse("1970.01.03 00:00:00"), sdf.parse("1970.01.03 23:59:59"));
+					}
+				} catch (ParseException e)
+				{
+					e.printStackTrace();
+				}
+			}
+			
 			if(calendar.get(Calendar.DAY_OF_YEAR)==3)
 			{
 				this.powerSystem.setCondition(false);
@@ -382,44 +425,88 @@ public class Manager extends Thread implements Management
 				sellingPriceList.addFirst(powerSystem.getSellingPrice());
 			}
 			
+			// 检查停电预警时间是否已经过去
+			if(this.outageExpected)
+			{
+				if(this.end.before(new Date(timestamp)))
+					this.outageExpected = false;
+			}
+			
 			// 分配下一时间段的储能装置策略
+			// 需要检查是否停电，以及是否有停电预警
 			// 如果没有停电
 			if(powerSystem.getCondition())
 			{
+				// 设置没有处于停电状态
 				for(String name:users.keySet())
 				{
 					users.get(name).setBlackedOut(false);
 				}
 				
-				// 价格低于平均
-				if(avgSellingPrice > powerSystem.getBuyingPrice()*STOP_CONSUMING_RATIO)
+				// 如果没有停电预警，则正常进行储能
+				if(!this.outageExpected)
 				{
-					// 如果价格远低于平均，那么就买电
-					if(avgSellingPrice > powerSystem.getBuyingPrice()*BUY_RATIO)
+					// 价格低于平均
+					if(avgSellingPrice > powerSystem.getBuyingPrice()*STOP_CONSUMING_RATIO)
 					{
-						setStorageInputPower(maxStorageInputPower);
+						// 如果价格远低于平均，那么就买电
+						if(avgSellingPrice > powerSystem.getBuyingPrice()*BUY_RATIO)
+						{
+							setStorageInputPower(maxStorageInputPower);
+						}
+						// 否则停止储能装置的供能
+						else
+						{
+							setStorageInputPower(0);
+						}
 					}
-					// 否则停止储能装置的供能
-					else
+					// 价格高于平均
+					if(avgBuyingPrice < powerSystem.getSellingPrice()*START_CONSUMING_RATIO)
 					{
-						setStorageInputPower(0);
+						// 如果价格远高于平均，那么就卖电
+						if(avgBuyingPrice < powerSystem.getSellingPrice()*SELL_RATIO)
+						{
+							setStorageInputPower(-maxStorageOutputPower);
+						}
+						// 否则使用储能装置供电
+						else
+						{
+							setStorageInputPower(-totalPowerUser + totalPowerGenerator);
+						}
 					}
 				}
-				// 价格高于平均
-				if(avgBuyingPrice < powerSystem.getSellingPrice()*START_CONSUMING_RATIO)
+				// 如果距离停电发生还有六小时以上，那么不允许对储能装置的电能进行销售
+				else if(this.begin.getTime() - timestamp > 6*60*60*1000)
 				{
-					// 如果价格远高于平均，那么就卖电
-					if(avgBuyingPrice < powerSystem.getSellingPrice()*SELL_RATIO)
+					// 价格低于平均
+					if(avgSellingPrice > powerSystem.getBuyingPrice()*STOP_CONSUMING_RATIO)
 					{
-						setStorageInputPower(-maxStorageOutputPower);
+						// 如果价格远低于平均，那么就买电
+						if(avgSellingPrice > powerSystem.getBuyingPrice()*BUY_RATIO)
+						{
+							setStorageInputPower(maxStorageInputPower);
+						}
+						// 否则停止储能装置的供能
+						else
+						{
+							setStorageInputPower(0);
+						}
 					}
-					// 否则使用储能装置供电
-					else
+					// 价格高于平均
+					if(avgBuyingPrice < powerSystem.getSellingPrice()*START_CONSUMING_RATIO)
 					{
+						// 只允许使用储能装置供电，禁止卖电
 						setStorageInputPower(-totalPowerUser + totalPowerGenerator);
 					}
 				}
+				// 如果有停电预警，那么在停电开始前六小时内，需要对储能装置进行充能
+				// 确保在停电开始之前，储能装置处于满电量状态
+				else
+				{
+					setStorageInputPower(maxStorageInputPower);
+				}
 			}
+			// 发生停电问题
 			else
 			{
 				// 发生停电问题，则所有能量由储能装置提供
@@ -452,6 +539,36 @@ public class Manager extends Thread implements Management
 							users.get(name).setBlackedOut(false);
 					}
 				}
+			}
+			
+			// 预测发电情况
+			if(prediction.size() == 0)
+			{
+				prediction.put("WindTurbine", new TimeSeries("WindTurbine"));
+				prediction.put("SolarPanel", new TimeSeries("SolarPanel"));
+				long time0 = timestamp % (1000*60*60);
+				for(int i=1; i<48; i++)
+				{
+					long time = time0 + i*1000*60*60;
+					double wind = this.predictor.getWindPowerPrediction(time);
+					double solar = this.predictor.getSolarPanelPrediction(time);
+					prediction.get("WindTurbine").add(new FixedMillisecond(time), wind);
+					prediction.get("SolarPanel").add(new FixedMillisecond(time), solar);
+					
+					System.out.printf("PREDICTION:%f %f\n", wind, solar);
+				}
+				nextPredictingTime = time0 + 1000*60*60;
+			}
+			else if(nextPredictingTime <= timestamp)
+			{
+				long time = nextPredictingTime + 48*1000*60*60;
+				double wind = this.predictor.getWindPowerPrediction(time);
+				double solar = this.predictor.getSolarPanelPrediction(time);
+				prediction.get("WindTurbine").add(new FixedMillisecond(time), wind);
+				prediction.get("SolarPanel").add(new FixedMillisecond(time), solar);
+				
+				System.out.printf("PREDICTION:%f %f\n", wind, solar);
+				nextPredictingTime += 1000*60*60;
 			}
 			
 			// 标记初始化完成
@@ -499,8 +616,9 @@ public class Manager extends Thread implements Management
 		}
 	}
 	
-	// 天气信息
-	private Weather weather;
+	// 天气预报与发电预测
+	private WeatherForecast weatherForecast = null;
+	private Predictor predictor = new Predictor();
 	
 	// 记录管理的设备
 	private PowerSystem powerSystem;
@@ -559,8 +677,9 @@ public class Manager extends Thread implements Management
 	private HashMap<String, String> userInfo = new HashMap<String, String>();
 	private HashMap<String, String> storageInfo = new HashMap<String, String>();
 	
-	// 用电数据的预测值
-	
+	// 发电数据的预测值
+	private HashMap<String, TimeSeries> prediction = new HashMap<String, TimeSeries>();
+	private long nextPredictingTime = 0;
 	
 	// 初始化完成标记
 	private boolean initialized = false;
@@ -582,5 +701,10 @@ public class Manager extends Thread implements Management
 	
 	// 发送邮件的类
 	private Email email = new Email();
+	
+	// 停电预警使用的变量
+	private boolean outageExpected = false;
+	private Date begin = null;
+	private Date end = null;
 
 }

@@ -47,6 +47,11 @@ public class SolarPanel extends Thread implements Generator{
 	{
 		this.weather = weather;
 	}
+	
+	public double getPanelArea()
+	{
+		return panelArea;
+	}
 
 	
 	@Override
@@ -118,10 +123,10 @@ public class SolarPanel extends Thread implements Generator{
 	{
 		return getPower(temparature,radiancy,cloudness)/getVoltage(temparature,radiancy,cloudness);
 	}
-	private double getPower(double temparature, double radiancy,double cloudness)
+	private double getPower(double temperature, double radiancy,double cloudness)
 	{
 		
-		double eta = nominalEfficiency*(1-beta*(temparature-25));
+		double eta = nominalEfficiency*(1-beta*(temperature-25));
 		return eta*panelArea*getSurfaceRadiancy(radiancy,cloudness) /1000;
 	}
 	private double getSurfaceRadiancy(double radiancy,double cloudness) {

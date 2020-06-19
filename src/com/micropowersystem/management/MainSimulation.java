@@ -53,7 +53,7 @@ public class MainSimulation {
 		Storage s1 = new Storage("storage_2.properties");
 		
 		Manager m = new Manager();
-		m.setWeather(w0);
+		m.setWeatherForecast(wf0);
 		
 		m.addGenerator(g0);
 		m.addGenerator(g1);
