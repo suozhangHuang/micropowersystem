@@ -153,9 +153,9 @@ public class Weather extends Thread
 		calendar.setTime(new Date(time));
 		double timeInHour = calendar.get(Calendar.HOUR_OF_DAY) + calendar.get(Calendar.MINUTE)/60.0;
 		if(TYPE2 == WINDY) {
-			return 5-0.3468*timeInHour+0.0553*Math.pow(timeInHour,2)-0.0017*Math.pow(timeInHour,3)+10;
+			return 8-0.3468*timeInHour+0.0553*Math.pow(timeInHour,2)-0.0017*Math.pow(timeInHour,3)+10;
 		}else {
-			return 5-0.3468*timeInHour+0.0553*Math.pow(timeInHour,2)-0.0017*Math.pow(timeInHour,3);
+			return 8-0.3468*timeInHour+0.0553*Math.pow(timeInHour,2)-0.0017*Math.pow(timeInHour,3);
 		}
 		
 	}

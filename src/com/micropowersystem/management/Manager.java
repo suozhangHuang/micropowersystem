@@ -457,7 +457,7 @@ public class Manager extends Thread implements Management
 				{
 					if(users.get(name).getIfBlackedOut()) {
 						Date currentTime = new Date(timestamp);
-						String message = "在"+currentTime.toString()+name+"恢复与电力供应"+"\n";
+						String message = "在"+currentTime.toString()+" "+name+"恢复与电力供应"+"\n";
 						this.dataHandler.updateMessage(message);
 						users.get(name).setBlackedOut(false);
 					}
@@ -542,7 +542,7 @@ public class Manager extends Thread implements Management
 						if(maxStorageEnergy*0.3 > currentStorageEnergy) {
 							if(!users.get(name).getIfBlackedOut()) {
 								Date currentTime = new Date(timestamp);
-								String message = "在"+currentTime.toString()+name+"失去电力供应"+"\n";
+								String message = "在"+currentTime.toString()+" "+name+"失去电力供应"+"\n";
 								this.dataHandler.updateMessage(message);
 								users.get(name).setBlackedOut(true);
 							}
@@ -550,7 +550,7 @@ public class Manager extends Thread implements Management
 						else if(maxStorageEnergy*0.95 < currentStorageEnergy) {
 							if(users.get(name).getIfBlackedOut()) {
 								Date currentTime = new Date(timestamp);
-								String message = "在"+currentTime.toString()+name+"恢复电力供应"+"\n";
+								String message = "在"+currentTime.toString()+" "+name+"恢复电力供应"+"\n";
 								this.dataHandler.updateMessage(message);
 								users.get(name).setBlackedOut(false);
 							}
@@ -562,7 +562,7 @@ public class Manager extends Thread implements Management
 						if(maxStorageEnergy*0.3 > currentStorageEnergy) {
 							if(!users.get(name).getIfBlackedOut()) {
 								Date currentTime = new Date(timestamp);
-								String message = "在"+currentTime.toString()+name+"失去电力供应"+"\n";
+								String message = "在"+currentTime.toString()+" "+name+"失去电力供应"+"\n";
 								this.dataHandler.updateMessage(message);
 								users.get(name).setBlackedOut(true);
 							}
@@ -570,7 +570,7 @@ public class Manager extends Thread implements Management
 						else if(maxStorageEnergy*0.95 < currentStorageEnergy) {
 							if(users.get(name).getIfBlackedOut()) {
 								Date currentTime = new Date(timestamp);
-								String message = "在"+currentTime.toString()+name+"恢复电力供应"+"\n";
+								String message = "在"+currentTime.toString()+" "+name+"恢复电力供应"+"\n";
 								this.dataHandler.updateMessage(message);
 								users.get(name).setBlackedOut(false);
 							}
@@ -581,7 +581,7 @@ public class Manager extends Thread implements Management
 						if(maxStorageEnergy*0.05 > currentStorageEnergy) {
 							if(!users.get(name).getIfBlackedOut()) {
 								Date currentTime = new Date(timestamp);
-								String message = "在"+currentTime.toString()+name+"失去电力供应"+"\n";
+								String message = "在"+currentTime.toString()+" "+name+"失去电力供应"+"\n";
 								this.dataHandler.updateMessage(message);
 								users.get(name).setBlackedOut(true);
 							}
@@ -589,7 +589,7 @@ public class Manager extends Thread implements Management
 						else  if(maxStorageEnergy*0.3 < currentStorageEnergy) {
 							if(users.get(name).getIfBlackedOut()) {
 								Date currentTime = new Date(timestamp);
-								String message = "在"+currentTime.toString()+name+"恢复电力供应"+"\n";
+								String message = "在"+currentTime.toString()+" "+name+"恢复电力供应"+"\n";
 								this.dataHandler.updateMessage(message);
 								users.get(name).setBlackedOut(false);
 							}
