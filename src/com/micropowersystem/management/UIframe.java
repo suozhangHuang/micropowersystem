@@ -309,6 +309,7 @@ public class UIframe extends JFrame implements DataHandler{
 		//jPanels[1]
 		journalTextAreaP1 = new JTextArea(5,30);
 		journalTextAreaP1.setLineWrap(true);
+		journalTextAreaP1.setEditable(false);
 		scrollPane0P1 = new JScrollPane(journalTextAreaP1);
 		chartP1 = ChartFactory.createTimeSeriesChart("Total Power of Different Sides", "Time","Power/KW", null, true, false, false);
 		chartPanelP1 = new ChartPanel(chartP1);
@@ -538,6 +539,7 @@ public class UIframe extends JFrame implements DataHandler{
 				jDialog.add(tempLabel,BorderLayout.CENTER);
 				
 				jDialog.setVisible(true);
+				jDialog.setAlwaysOnTop(true);
 			}
 		});
 		
@@ -586,6 +588,7 @@ public class UIframe extends JFrame implements DataHandler{
 				jEmailDialog.add(tempUpPanel,BorderLayout.NORTH);
 				jEmailDialog.add(tempDownPanel,BorderLayout.CENTER);
 				jEmailDialog.setVisible(true);
+				jEmailDialog.setAlwaysOnTop(true);
 			}
 			
 		});
