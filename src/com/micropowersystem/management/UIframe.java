@@ -539,6 +539,7 @@ public class UIframe extends JFrame implements DataHandler{
 				jDialog.add(tempLabel,BorderLayout.CENTER);
 				
 				jDialog.setVisible(true);
+				jDialog.setAlwaysOnTop(true);
 			}
 		});
 		
@@ -587,6 +588,7 @@ public class UIframe extends JFrame implements DataHandler{
 				jEmailDialog.add(tempUpPanel,BorderLayout.NORTH);
 				jEmailDialog.add(tempDownPanel,BorderLayout.CENTER);
 				jEmailDialog.setVisible(true);
+				jEmailDialog.setAlwaysOnTop(true);
 			}
 			
 		});

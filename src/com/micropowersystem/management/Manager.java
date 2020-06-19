@@ -262,7 +262,7 @@ public class Manager extends Thread implements Management
 			this.end = end;
 			
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
-			System.out.printf("接收到停电预警，预计停电时间为\n%s - %s\n", sdf.format(begin), sdf.format(end));
+//			System.out.printf("接收到停电预警，预计停电时间为\n%s - %s\n", sdf.format(begin), sdf.format(end));
 			return true;
 		}else {
 			return false;
@@ -612,7 +612,7 @@ public class Manager extends Thread implements Management
 					prediction.get("WindTurbine").add(new FixedMillisecond(time), wind);
 					prediction.get("SolarPanel").add(new FixedMillisecond(time), solar);
 					
-					System.out.printf("PREDICTION:%f %f\n", wind, solar);
+//					System.out.printf("PREDICTION:%f %f\n", wind, solar);
 				}
 				nextPredictingTime = time0 + 1000*60*60;
 			}
@@ -624,7 +624,7 @@ public class Manager extends Thread implements Management
 				prediction.get("WindTurbine").add(new FixedMillisecond(time), wind);
 				prediction.get("SolarPanel").add(new FixedMillisecond(time), solar);
 				
-				System.out.printf("PREDICTION:%f %f\n", wind, solar);
+//				System.out.printf("PREDICTION:%f %f\n", wind, solar);
 				nextPredictingTime += 1000*60*60;
 			}
 			
