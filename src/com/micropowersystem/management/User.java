@@ -75,6 +75,10 @@ public class User extends Thread
 		return blackedOut ? 0 :currentPower;
 	}
 	
+	public boolean getIfBlackedOut() {
+		return blackedOut;
+	}
+	
 	public void userStart()
 	{
 		if(!started)

@@ -7,12 +7,17 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -45,13 +50,18 @@ public class UIframe extends JFrame implements DataHandler{
 	private JMenuBar menuBar;
 	private JMenu helpMenu;
 	private JMenu moreMenu;
+	private JMenu stopMenu;
 	private JMenuItem helpMenuItem;
 	private JMenuItem emailMenuItem;
 	private JMenuItem connectMenuItem;
+	private JMenuItem stopOrStartNow;
+	private JMenuItem stopPlan;
+	
 	
 	private JDialog jDialog;
 	private JDialog jHelpDialog;
 	private JDialog jEmailDialog;
+	private JDialog stopPlanDialog;
 	
 	//jPanel[0]
 	private JPanel infoPanelP0;
@@ -72,6 +82,8 @@ public class UIframe extends JFrame implements DataHandler{
 	private JTextArea text2P0;
 	
 	//jPanel[1]
+	private JTextArea journalTextAreaP1;
+	private JScrollPane scrollPane0P1; 
 	private JFreeChart chartP1;
 	private ChartPanel chartPanelP1;
 	
@@ -153,7 +165,8 @@ public class UIframe extends JFrame implements DataHandler{
 	private Vector<HashMap<String,String>> infoVec = new Vector<HashMap<String,String>>();
 	private HashMap<String,TimeSeries> forecastPowerTS = null;
 	private HashMap<String,TimeSeries> storageEnergyTS = null;
-	
+	private String planStopBeginTime = null;
+	private String planStopEndTime = null;
 	
 	//flags
 	private boolean managementStatus = false;
@@ -187,18 +200,28 @@ public class UIframe extends JFrame implements DataHandler{
 		
 		helpMenu = new JMenu("帮助");
 		moreMenu = new JMenu("更多");
+		stopMenu = new JMenu("模拟孤岛运行");
+		
 		helpMenuItem = new JMenuItem("说明");
 		emailMenuItem = new JMenuItem("邮件提醒");
 		connectMenuItem = new JMenuItem("连接设备");
+		stopOrStartNow = new JMenuItem("立即切断电网连接");
+		stopPlan = new JMenuItem("设置切断计划");
 		
 		emailMenuItem.setEnabled(false);
 		
 		helpMenu.add(helpMenuItem);
 		moreMenu.add(connectMenuItem);
 		moreMenu.add(emailMenuItem);
+		stopMenu.add(stopOrStartNow);
+		stopMenu.add(stopPlan);
 		
 		menuBar.add(moreMenu);
 		menuBar.add(helpMenu);
+		menuBar.add(stopMenu);
+		
+		
+		
 		
 		//初始化jTabbedPane
 		jTabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -254,9 +277,9 @@ public class UIframe extends JFrame implements DataHandler{
 		scrollPane1P0.setViewportView(list1P0);
 		scrollPane2P0.setViewportView(list2P0);
 		
-		text0P0 = new JTextArea();
-		text1P0 = new JTextArea();
-		text2P0 = new JTextArea();
+		text0P0 = new JTextArea(10,10);
+		text1P0 = new JTextArea(10,10);
+		text2P0 = new JTextArea(10,10);
 		
 		text0P0.setText("选择设备以获取详细信息");
 		text1P0.setText("选择设备以获取详细信息");
@@ -284,9 +307,13 @@ public class UIframe extends JFrame implements DataHandler{
 		
 		
 		//jPanels[1]
+		journalTextAreaP1 = new JTextArea(5,30);
+		journalTextAreaP1.setLineWrap(true);
+		scrollPane0P1 = new JScrollPane(journalTextAreaP1);
 		chartP1 = ChartFactory.createTimeSeriesChart("Total Power of Different Sides", "Time","Power/KW", null, true, false, false);
 		chartPanelP1 = new ChartPanel(chartP1);
 		jPanels[1].setLayout(new BorderLayout());
+		jPanels[1].add(scrollPane0P1,BorderLayout.NORTH);
 		jPanels[1].add(chartPanelP1,BorderLayout.CENTER);
 		//jPanels[1] end
 		
@@ -317,9 +344,9 @@ public class UIframe extends JFrame implements DataHandler{
 		scrollPane0P3.setViewportView(list0P3);
 		scrollPane1P3.setViewportView(list1P3);
 		
-		addButP3 = new JButton("Add");
-		removeButP3 = new JButton("Remove");
-		showButP3 = new JButton("Show");
+		addButP3 = new JButton("添加");
+		removeButP3 = new JButton("删除");
+		showButP3 = new JButton("展示");
 		
 		//不知道怎么实现按钮大小一致
 		
@@ -377,9 +404,9 @@ public class UIframe extends JFrame implements DataHandler{
 		scrollPane0P4.setViewportView(list0P4);
 		scrollPane1P4.setViewportView(list1P4);
 		
-		addButP4 = new JButton("Add");
-		removeButP4 = new JButton("Remove");
-		showButP4 = new JButton("Show");
+		addButP4 = new JButton("添加");
+		removeButP4 = new JButton("删除");
+		showButP4 = new JButton("展示");
 		
 		addButP4.setEnabled(false);
 		removeButP4.setEnabled(false);
@@ -553,7 +580,7 @@ public class UIframe extends JFrame implements DataHandler{
 					
 				});
 				tempDownPanel.add(tempBox);
-				jEmailDialog.setSize(200,150);
+				jEmailDialog.setSize(400,100);
 				jEmailDialog.setLocation(400, 300);
 				jEmailDialog.setLayout(new BorderLayout());
 				jEmailDialog.add(tempUpPanel,BorderLayout.NORTH);
@@ -563,6 +590,87 @@ public class UIframe extends JFrame implements DataHandler{
 			
 		});
 		
+		stopOrStartNow.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				if(stopOrStartNow.getText().equals("立即切断电网连接")) {
+					management.controlPowerSystem(false);
+					stopOrStartNow.setText("立即接入电网");
+				}else {
+					management.controlPowerSystem(true);
+					stopOrStartNow.setText("立即切断电网连接");
+				}
+			}
+			
+		});
+		
+		stopPlan.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				stopPlanDialog = new JDialog();
+				JLabel tempLabel0 = new JLabel();
+				JLabel tempLabel1 = new JLabel();
+				JLabel tempLabel2 = new JLabel();
+				JTextField textFiled0 = new JTextField();
+				JTextField textFiled1 = new JTextField();
+				JButton applyBut = new JButton("Apply");
+				textFiled0.addKeyListener(new KeyListener() {
+
+					public void keyPressed(KeyEvent arg0) {
+						tempLabel2.setText("时间输入格式为：yyyy.MM.dd HH:mm:ss");
+					}
+					public void keyReleased(KeyEvent arg0) {
+					}
+					public void keyTyped(KeyEvent arg0) {
+					}
+					
+				});
+				textFiled1.addKeyListener(new KeyListener() {
+
+					public void keyPressed(KeyEvent arg0) {
+						tempLabel2.setText("时间输入格式为：yyyy.MM.dd HH:mm:ss");
+					}
+					public void keyReleased(KeyEvent arg0) {
+					}
+					public void keyTyped(KeyEvent arg0) {
+					}
+					
+				});
+				applyBut.addActionListener(new ActionListener() {
+
+					public void actionPerformed(ActionEvent e) {
+						planStopBeginTime = textFiled0.getText();
+						planStopEndTime = textFiled1.getText();
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+						try {
+							if(management.outageWarning(sdf.parse(planStopBeginTime), sdf.parse(planStopEndTime))) {
+								tempLabel2.setText("设置成功，请退出");
+							}
+						} catch (ParseException e1) {
+							e1.printStackTrace();
+							tempLabel2.setText("输入的时间或者格式无效");
+						}
+					}
+					
+				});
+				
+				tempLabel0.setText("请输入你要想要切断电网的时间");
+				tempLabel1.setText("请输入计划重新接入电网的时间");
+				tempLabel2.setText("时间输入格式为：yyyy.MM.dd HH:mm:ss");
+				stopPlanDialog.setLayout(new GridLayout(0,1));
+				stopPlanDialog.add(tempLabel0);
+				stopPlanDialog.add(textFiled0);
+				stopPlanDialog.add(tempLabel1);
+				stopPlanDialog.add(textFiled1);
+				stopPlanDialog.add(tempLabel2);
+				stopPlanDialog.add(applyBut);
+				
+				stopPlanDialog.setSize(400,150);
+				stopPlanDialog.setLocation(400, 300);
+				stopPlanDialog.setVisible(true);
+			}
+			
+		});
 		
 		list0P0.addListSelectionListener(new ListSelectionListener() {
 
@@ -747,6 +855,12 @@ public class UIframe extends JFrame implements DataHandler{
 		infoLabelP4[1].setText(String.format("%.1f",Prices.get(2))+"kWh");
 		infoLabelP4[2].setText(String.format("%.1f",Prices.get(1))+"元");
 		infoLabelP4[3].setText(String.format("%.1f",Prices.get(3))+"kWh");
+	}
+
+	@Override
+	public void updateMessage(String message) {
+		
+		journalTextAreaP1.append(message);
 	}
 	
 }

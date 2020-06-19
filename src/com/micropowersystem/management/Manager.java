@@ -252,7 +252,7 @@ public class Manager extends Thread implements Management
 	
 	// 停电预警设置
 	// 多次设置时，如果设置的时间是合法的，那么将会直接覆盖
-	public void outageWarning(Date begin, Date end)
+	public boolean outageWarning(Date begin, Date end)
 	{
 		Date currentTime = new Date(timestamp);
 		if(currentTime.before(begin) && end.after(begin))
@@ -263,6 +263,9 @@ public class Manager extends Thread implements Management
 			
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 			System.out.printf("接收到停电预警，预计停电时间为\n%s - %s\n", sdf.format(begin), sdf.format(end));
+			return true;
+		}else {
+			return false;
 		}
 	}
 	
@@ -288,31 +291,43 @@ public class Manager extends Thread implements Management
 
 			/************************模拟停电*************************/
 			
+			
 			// 提前12h进行预警
-			if(!this.outageExpected)
-			{
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
-				try
-				{
-					if(timestamp > sdf.parse("1970.01.02 12:00:00").getTime() 
-							&& timestamp < sdf.parse("1970.01.02 23:59:59").getTime())
-					{
-						this.outageWarning(sdf.parse("1970.01.03 00:00:00"), sdf.parse("1970.01.03 23:59:59"));
-					}
-				} catch (ParseException e)
-				{
-					e.printStackTrace();
+			if(this.outageExpected) {
+				Date currentTime = new Date(timestamp);
+				if(begin.before(currentTime) && currentTime.before(end)) {
+					this.powerSystem.setCondition(false);
+				}else if(end.before(currentTime)) {
+					this.powerSystem.setCondition(true);
+					outageExpected = false;
 				}
 			}
 			
-			if(calendar.get(Calendar.DAY_OF_YEAR)==3)
-			{
-				this.powerSystem.setCondition(false);
-			}
-			else
-			{
-				this.powerSystem.setCondition(true);
-			}
+			
+			/*
+			 * if(calendar.get(Calendar.DAY_OF_YEAR)==2) {
+			 * this.powerSystem.setCondition(false); } else {
+			 * this.powerSystem.setCondition(true); }
+			 */
+			 if(powerSystem.getCondition()) {
+				if(haveSentMessage) {
+					Date currentTime = new Date(timestamp);
+					String message = "在"+currentTime.toString()+"恢复与电力系统的连接"+"\n";
+					dataHandler.updateMessage(message);
+					haveSentMessage = false;
+				}
+			 }else {
+				 if(!haveSentMessage) {
+					Date currentTime = new Date(timestamp);
+					String message = "在"+currentTime.toString()+"断开与电力系统的连接"+"\n";
+					dataHandler.updateMessage(message);
+					haveSentMessage = true;
+				 }
+			 }
+				 
+			
+			
+			
 			/************************模拟停电*************************/
 			
 			// 计算休眠时间内的电能变化
@@ -398,6 +413,7 @@ public class Manager extends Thread implements Management
 			}
 			else
 			{
+				
 				totalEnergyPowerSystem = 0;
 				totalPowerPowerSystem = 0;
 				powerSystemVoltage.get("PowerSystem").add(regularTimePeriod, 0);
@@ -426,11 +442,10 @@ public class Manager extends Thread implements Management
 			}
 			
 			// 检查停电预警时间是否已经过去
-			if(this.outageExpected)
-			{
-				if(this.end.before(new Date(timestamp)))
-					this.outageExpected = false;
-			}
+			/*
+			 * if(this.outageExpected) { if(this.end.before(new Date(timestamp)))
+			 * this.outageExpected = false; }
+			 */
 			
 			// 分配下一时间段的储能装置策略
 			// 需要检查是否停电，以及是否有停电预警
@@ -440,7 +455,12 @@ public class Manager extends Thread implements Management
 				// 设置没有处于停电状态
 				for(String name:users.keySet())
 				{
-					users.get(name).setBlackedOut(false);
+					if(users.get(name).getIfBlackedOut()) {
+						Date currentTime = new Date(timestamp);
+						String message = "在"+currentTime.toString()+name+"恢复与电力供应"+"\n";
+						this.dataHandler.updateMessage(message);
+						users.get(name).setBlackedOut(false);
+					}
 				}
 				
 				// 如果没有停电预警，则正常进行储能
@@ -519,24 +539,61 @@ public class Manager extends Thread implements Management
 				{
 					if(users.get(name).getType() == User.FACTORY)
 					{
-						if(maxStorageEnergy*0.3 > currentStorageEnergy)
-							users.get(name).setBlackedOut(true);
-						else if(maxStorageEnergy*0.95 < currentStorageEnergy)
-							users.get(name).setBlackedOut(false);
+						if(maxStorageEnergy*0.3 > currentStorageEnergy) {
+							if(!users.get(name).getIfBlackedOut()) {
+								Date currentTime = new Date(timestamp);
+								String message = "在"+currentTime.toString()+name+"失去电力供应"+"\n";
+								this.dataHandler.updateMessage(message);
+								users.get(name).setBlackedOut(true);
+							}
+						}
+						else if(maxStorageEnergy*0.95 < currentStorageEnergy) {
+							if(users.get(name).getIfBlackedOut()) {
+								Date currentTime = new Date(timestamp);
+								String message = "在"+currentTime.toString()+name+"恢复电力供应"+"\n";
+								this.dataHandler.updateMessage(message);
+								users.get(name).setBlackedOut(false);
+							}
+						}
+							
 					}
 					else if(users.get(name).getType() == User.OFFICE)
 					{
-						if(maxStorageEnergy*0.3 > currentStorageEnergy)
-							users.get(name).setBlackedOut(true);
-						else if(maxStorageEnergy*0.95 < currentStorageEnergy)
-							users.get(name).setBlackedOut(false);
+						if(maxStorageEnergy*0.3 > currentStorageEnergy) {
+							if(!users.get(name).getIfBlackedOut()) {
+								Date currentTime = new Date(timestamp);
+								String message = "在"+currentTime.toString()+name+"失去电力供应"+"\n";
+								this.dataHandler.updateMessage(message);
+								users.get(name).setBlackedOut(true);
+							}
+						}
+						else if(maxStorageEnergy*0.95 < currentStorageEnergy) {
+							if(users.get(name).getIfBlackedOut()) {
+								Date currentTime = new Date(timestamp);
+								String message = "在"+currentTime.toString()+name+"恢复电力供应"+"\n";
+								this.dataHandler.updateMessage(message);
+								users.get(name).setBlackedOut(false);
+							}
+						}
 					}
 					else if(users.get(name).getType() == User.FAMILY)
 					{
-						if(maxStorageEnergy*0.05 > currentStorageEnergy)
-							users.get(name).setBlackedOut(true);
-						else  if(maxStorageEnergy*0.3 < currentStorageEnergy)
-							users.get(name).setBlackedOut(false);
+						if(maxStorageEnergy*0.05 > currentStorageEnergy) {
+							if(!users.get(name).getIfBlackedOut()) {
+								Date currentTime = new Date(timestamp);
+								String message = "在"+currentTime.toString()+name+"失去电力供应"+"\n";
+								this.dataHandler.updateMessage(message);
+								users.get(name).setBlackedOut(true);
+							}
+						}
+						else  if(maxStorageEnergy*0.3 < currentStorageEnergy) {
+							if(users.get(name).getIfBlackedOut()) {
+								Date currentTime = new Date(timestamp);
+								String message = "在"+currentTime.toString()+name+"恢复电力供应"+"\n";
+								this.dataHandler.updateMessage(message);
+								users.get(name).setBlackedOut(false);
+							}
+						}
 					}
 				}
 			}
@@ -706,5 +763,13 @@ public class Manager extends Thread implements Management
 	private boolean outageExpected = false;
 	private Date begin = null;
 	private Date end = null;
+	
+	//传递停电信息所使用的变量
+	private boolean haveSentMessage = false;
+	@Override
+	
+	public void controlPowerSystem(boolean OnOrOff) {
+		this.powerSystem.setCondition(OnOrOff);
+	}
 
 }

@@ -1,5 +1,6 @@
 package com.micropowersystem.management;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -30,5 +31,7 @@ public interface Management {
 	public HashMap<String,TimeSeries> getStorageEnergy();
 	
 	public boolean sendEmail(String receiveMailAccount);
+	public void controlPowerSystem(boolean OnOrOff);
+	public boolean outageWarning(Date begin, Date end);
 	
 }
